@@ -42,6 +42,17 @@ class ULID internal constructor(
         }
     }
 
+    class MonotonicGenerator(ulid: ULID = randomULID()) {
+        private var timestamp = ulid.timestamp.value
+        private var entropy = ulid.entropy
+        operator fun invoke(timestamp: Long = this.timestamp): ULID {
+            require(!entropy.isFull()) {
+                throw IllegalStateException("Entropy will be overflowed")
+            }
+            return ULID(timestamp = Timestamp(timestamp), entropy = ++entropy)
+        }
+    }
+
     fun timestamp(): Long = timestamp.value
     fun entropy(): ByteArray = entropy.binary
 
