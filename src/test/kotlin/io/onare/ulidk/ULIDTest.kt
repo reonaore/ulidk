@@ -1,6 +1,7 @@
 package io.onare.ulidk
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 
 class ULIDTest : FunSpec({
@@ -60,6 +61,21 @@ class ULIDTest : FunSpec({
         val timestamp = Timestamp(0x010203040506)
         val testee = ULID(timestamp, entropy)
         testee.binary shouldBe (1..16).map { it.toByte() }.toByteArray()
+    }
+    context("monotonic") {
+        test("normal") {
+            val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY").getOrThrow()
+            val ulidGen = ULID.MonotonicGenerator(input)
+            ulidGen().toString() shouldBe "01BX5ZZKBKACTAV9WEVGEMMVRZ"
+            ulidGen().toString() shouldBe "01BX5ZZKBKACTAV9WEVGEMMVS0"
+        }
+        test("edge case") {
+            val ulidGen = ULID.MonotonicGenerator(ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY").getOrThrow())
+            ulidGen().toString() shouldBe "01BX5ZZKBKZZZZZZZZZZZZZZZZ"
+            runCatching {
+                ulidGen().toString()
+            }.isFailure.shouldBeTrue()
+        }
     }
 
 })

@@ -26,6 +26,13 @@ internal class Entropy(
         }
     }
 
+    operator fun inc(): Entropy {
+        val l = lsb.inc()
+        val m = if (l.value == 0L) {
+            msb.inc()
+        } else msb
+        return Entropy(m, l)
+    }
 
     internal fun write(buf: ByteBuffer) {
         msb.write(buf)
@@ -42,10 +49,14 @@ internal class Entropy(
         msb.writeBase32(buf)
         lsb.writeBase32(buf)
     }
+
+    fun isFull(): Boolean = msb.isFull() && lsb.isFull()
 }
 
 // This class stands for variable which has 40 bits
-internal class EntropyValue(val value: Long) {
+internal class EntropyValue(value: Long) {
+
+    val value = value and BIT_MASK
 
     companion object {
         private const val CHUNK_BITS = 40 // CHUNK_BYTES * BYTE_BITS
@@ -75,7 +86,10 @@ internal class EntropyValue(val value: Long) {
             }
             return EntropyValue(chunk)
         }
+
     }
+
+    operator fun inc(): EntropyValue = EntropyValue(value + 1)
 
     constructor(binary: ByteArray) : this(parseBinary(binary))
 
@@ -90,4 +104,6 @@ internal class EntropyValue(val value: Long) {
             buf.put(ULID.toBase32[(value ushr shiftBits and BASE32_MASK).toInt()])
         }
     }
+
+    fun isFull(): Boolean = value == BIT_MASK
 }

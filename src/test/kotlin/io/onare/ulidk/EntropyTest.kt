@@ -34,4 +34,34 @@ class EntropyTest : FunSpec({
         got.flip()
         String(got.array()) shouldBe "0123456789ABCDEF"
     }
+
+    context("increment") {
+        test("entropy value") {
+            EntropyValue(1).inc().value shouldBe EntropyValue(2).value
+            EntropyValue(0xffffffffff).inc().value shouldBe EntropyValue(0).value
+        }
+        test("entropy") {
+            Entropy(
+                msb = EntropyValue(1),
+                lsb = EntropyValue(2)
+            ).inc().apply {
+                msb.value shouldBe EntropyValue(1).value
+                lsb.value shouldBe EntropyValue(3).value
+            }
+            Entropy(
+                msb = EntropyValue(0xffffffffff),
+                lsb = EntropyValue(0xffffffffff)
+            ).inc().apply {
+                msb.value shouldBe EntropyValue(0).value
+                lsb.value shouldBe EntropyValue(0).value
+            }
+            Entropy(
+                msb = EntropyValue(0x0),
+                lsb = EntropyValue(0xffffffffff)
+            ).inc().apply {
+                msb.value shouldBe EntropyValue(1).value
+                lsb.value shouldBe EntropyValue(0).value
+            }
+        }
+    }
 })
