@@ -68,6 +68,9 @@ class ULID internal constructor(
         }
 
 
+        /**
+         * Generates ULID from UUID
+         */
         fun fromUUID(uuid: UUID): ULID {
             val buf = ByteBuffer.allocate(BINARY_SIZE)
             buf.putLong(uuid.mostSignificantBits)
