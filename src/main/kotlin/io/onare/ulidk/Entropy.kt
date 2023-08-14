@@ -2,19 +2,35 @@ package io.onare.ulidk
 
 import java.nio.ByteBuffer
 
+/**
+ * This class stands for the randomness part of ULID
+ * @property binary entropy as binary
+ * @property msb Most significant bits of the entropy (40bits)
+ * @property lsb Least significant bits of the entropy (40bits)
+ */
 internal class Entropy(
     val msb: EntropyValue,
     val lsb: EntropyValue,
 ) {
 
     companion object {
+
         internal const val BYTE_SIZE = 10
+
+        /**
+         * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
+         * @param byteList
+         */
         fun fromDecodedBytes(byteList: List<Long>): Entropy {
             val msb = EntropyValue.fromDecodedBytes(byteList.subList(0, 8))
             val lsb = EntropyValue.fromDecodedBytes(byteList.subList(8, 16))
             return Entropy(msb, lsb)
         }
 
+        /**
+         * This method is used to generate Entropy binary
+         * @param binary the length must be 80 bits
+         */
         fun fromBinary(binary: ByteArray): Entropy {
             require(binary.size == BYTE_SIZE) {
                 "Binary length must be $BYTE_SIZE"
@@ -34,6 +50,9 @@ internal class Entropy(
         return Entropy(m, l)
     }
 
+    /**
+     * Write the value as binary
+     */
     internal fun write(buf: ByteBuffer) {
         msb.write(buf)
         lsb.write(buf)
@@ -45,15 +64,24 @@ internal class Entropy(
             flip()
         }.array()
 
+    /**
+     * Write the value as binary
+     */
     fun writeBase32(buf: ByteBuffer) {
         msb.writeBase32(buf)
         lsb.writeBase32(buf)
     }
 
+    /**
+     * @return true if the value has 80bits all high
+     */
     fun isFull(): Boolean = msb.isFull() && lsb.isFull()
 }
 
-// This class stands for variable which has 40 bits
+/**
+ * This class stands for variable which has 40 bits
+ * @property value this value has 40 bits
+ */
 internal class EntropyValue(value: Long) {
 
     val value = value and BIT_MASK
@@ -78,6 +106,10 @@ internal class EntropyValue(value: Long) {
             return v and BIT_MASK
         }
 
+        /**
+         * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
+         * @param byteList
+         */
         fun fromDecodedBytes(byteList: List<Long>): EntropyValue {
             var chunk = 0L
             // 35 = (chunk string length (8) - 1) * 5 bit
@@ -93,17 +125,26 @@ internal class EntropyValue(value: Long) {
 
     constructor(binary: ByteArray) : this(parseBinary(binary))
 
+    /**
+     * Write the value as binary
+     */
     fun write(buf: ByteBuffer) {
         for (shiftBits in 32 downTo 0 step BYTE_BITS) {
             buf.put(((value ushr shiftBits) and 0xff).toByte())
         }
     }
 
+    /**
+     * Write the value with Base32 encoded to buffer
+     */
     fun writeBase32(buf: ByteBuffer) {
         for (shiftBits in CHUNK_BITS - ULID.BIT_NUM downTo 0 step ULID.BIT_NUM) {
             buf.put(ULID.toBase32[(value ushr shiftBits and BASE32_MASK).toInt()])
         }
     }
 
+    /**
+     * @return true if the value is 40bits all high
+     */
     fun isFull(): Boolean = value == BIT_MASK
 }

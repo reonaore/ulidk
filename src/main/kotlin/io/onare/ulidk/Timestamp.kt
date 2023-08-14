@@ -2,6 +2,10 @@ package io.onare.ulidk
 
 import java.nio.ByteBuffer
 
+/**
+ * This class stands for timestamp part of ULID
+ * @property value timestamp which is 48 bits
+ */
 internal class Timestamp(
     val value: Long
 ) {
