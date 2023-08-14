@@ -3,6 +3,8 @@ package io.onare.ulidk
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
+import java.nio.ByteBuffer
+import java.util.*
 
 class ULIDTest : FunSpec({
 
@@ -77,5 +79,21 @@ class ULIDTest : FunSpec({
             }.isFailure.shouldBeTrue()
         }
     }
+
+    context("uuid") {
+        val testUUID = "0189F43F-638C-E637-8CAE-422318BD567E"
+        val testULID = "01H7T3YRWCWRVRSBJ24CCBTNKY"
+        test("to uuid") {
+            val ulid = ULID.fromString(testULID).getOrThrow()
+            val buf = ByteBuffer.wrap(ulid.binary)
+            val uuid = UUID(buf.getLong(), buf.getLong())
+            uuid.toString().uppercase(Locale.getDefault()) shouldBe testUUID
+        }
+        test("from uuid") {
+            val ulid = ULID.fromUUID(UUID.fromString(testUUID))
+            ulid.toString() shouldBe ULID.fromString(testULID).getOrThrow().toString()
+        }
+    }
+
 
 })
