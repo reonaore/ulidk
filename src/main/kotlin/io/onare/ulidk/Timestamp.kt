@@ -13,6 +13,7 @@ internal class Timestamp(
     companion object {
         private const val BYTE_BITS = 8
         private const val BIT_MASK = 0xffffffffffff
+        private const val BIT_SIZE = 48
 
         fun fromDecodedBytes(byteList: List<Long>): Timestamp {
             var timestamp = 0L
@@ -21,6 +22,14 @@ internal class Timestamp(
                 timestamp = timestamp or ((byteList[index] shl shiftBits))
             }
             return Timestamp(timestamp and BIT_MASK)
+        }
+
+        fun fromBinary(bin: ByteArray): Timestamp {
+            var timestamp = 0L
+            (BIT_SIZE - BYTE_BITS downTo 0 step BYTE_BITS).forEachIndexed { index, shiftBits ->
+                timestamp = timestamp or ((bin[index].toLong() and 0xff) shl shiftBits)
+            }
+            return Timestamp(timestamp)
         }
     }
 

@@ -2,6 +2,7 @@ package io.onare.ulidk
 
 import java.nio.ByteBuffer
 import java.security.SecureRandom
+import java.util.*
 
 /**
  * ULID class
@@ -16,6 +17,7 @@ class ULID internal constructor(
 
     companion object {
         private const val BINARY_SIZE = 16
+        private const val TIMESTAMP_BINARY_SIZE = 6
         private const val STRING_LENGTH = 26
         private const val BASE32_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
         internal val toBase32 = BASE32_ALPHABET.toList().map { it.code.toByte() }
@@ -56,6 +58,24 @@ class ULID internal constructor(
                     entropy = Entropy.fromDecodedBytes(byteList.subList(10, 26)),
                 )
             )
+        }
+
+        private fun fromBinary(bin: ByteArray): ULID {
+            require(bin.size == BINARY_SIZE) { "Binary size must be $BINARY_SIZE" }
+            val timestamp = Timestamp.fromBinary(bin.sliceArray(0 until TIMESTAMP_BINARY_SIZE))
+            val entropy = Entropy.fromBinary(bin.sliceArray(TIMESTAMP_BINARY_SIZE until BINARY_SIZE))
+            return ULID(timestamp, entropy)
+        }
+
+
+        /**
+         * Generates ULID from UUID
+         */
+        fun fromUUID(uuid: UUID): ULID {
+            val buf = ByteBuffer.allocate(BINARY_SIZE)
+            buf.putLong(uuid.mostSignificantBits)
+            buf.putLong(uuid.leastSignificantBits)
+            return fromBinary(buf.array())
         }
     }
 
@@ -117,5 +137,10 @@ class ULID internal constructor(
     override fun toString() = str
     override fun compareTo(other: ULID): Int {
         return str.compareTo(other.str)
+    }
+
+    fun toUUID(): UUID {
+        val buf = ByteBuffer.wrap(binary)
+        return UUID(buf.getLong(), buf.getLong())
     }
 }
