@@ -1,0 +1,19 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:io.onare.ulidk////PointingToDeclaration/kulid/io.onare.ulidk/index.html
+$dokka.location:io.onare.ulidk/ULID.Companion///PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/-companion/index.html
+$dokka.location:io.onare.ulidk/ULID.Companion/fromString/#kotlin.String/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/-companion/from-string.html
+$dokka.location:io.onare.ulidk/ULID.Companion/fromUUID/#java.util.UUID/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/-companion/from-u-u-i-d.html
+$dokka.location:io.onare.ulidk/ULID.Companion/randomULID/#kotlin.Long#java.security.SecureRandom/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/-companion/random-u-l-i-d.html
+$dokka.location:io.onare.ulidk/ULID.MonotonicGenerator///PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/-monotonic-generator/index.html
+$dokka.location:io.onare.ulidk/ULID.MonotonicGenerator/MonotonicGenerator/#io.onare.ulidk.ULID/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/-monotonic-generator/-monotonic-generator.html
+$dokka.location:io.onare.ulidk/ULID.MonotonicGenerator/invoke/#kotlin.Long/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/-monotonic-generator/invoke.html
+$dokka.location:io.onare.ulidk/ULID///PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/index.html
+$dokka.location:io.onare.ulidk/ULID/binary/#/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/binary.html
+$dokka.location:io.onare.ulidk/ULID/compareTo/#io.onare.ulidk.ULID/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/compare-to.html
+$dokka.location:io.onare.ulidk/ULID/entropy/#/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/entropy.html
+$dokka.location:io.onare.ulidk/ULID/timestamp/#/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/timestamp.html
+$dokka.location:io.onare.ulidk/ULID/toString/#/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/to-string.html
+$dokka.location:io.onare.ulidk/ULID/toUUID/#/PointingToDeclaration/kulid/io.onare.ulidk/-u-l-i-d/to-u-u-i-d.html
+io.onare.ulidk
+
