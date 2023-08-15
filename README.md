@@ -1,6 +1,8 @@
 # What?
 
-[ULID](https://github.com/ulid/spec) implementation in Kotin
+[ULID](https://github.com/ulid/spec) implementation in Kotin.
+
+See [kDoc](https://reonaore.github.io/ulidk/) to see the specification.
 
 # Install
 
