@@ -1,4 +1,4 @@
-package io.onare.ulidk
+package io.github.reonaore.ulidk
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeTrue

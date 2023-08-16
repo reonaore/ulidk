@@ -1,4 +1,4 @@
-package io.onare.ulidk
+package io.github.reonaore.ulidk
 
 import org.openjdk.jmh.annotations.*
 import java.util.*
