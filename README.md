@@ -59,3 +59,31 @@ val uuid = UUID.randomUUID()
 val ulid = ULID.fromUUID(uuid)
 assert(uuid.toString() == ulid.toUUID().toString())
 ```
+
+## Test
+
+```shell
+./gradlew test
+```
+
+## Benchmark
+
+```shell
+./gradlew jmh 
+```
+
+### result
+
+on MacBook Air M1 2020, 8GB memory
+
+```text
+Benchmark                                Mode  Cnt         Score        Error  Units
+TestBenchmark.decodeThroughput          thrpt   10   3303345.521 ± 149622.901  ops/s
+TestBenchmark.generationThroughput      thrpt   10   3933690.923 ± 269409.409  ops/s
+TestBenchmark.monoGenerationThroughput  thrpt   10  17405324.773 ± 716794.007  ops/s
+TestBenchmark.uuidGenerationThroughput  thrpt   10   3327425.975 ±  77265.741  ops/s
+TestBenchmark.decodeAverage              avgt   10       303.135 ±     13.585  ns/op
+TestBenchmark.generationAverage          avgt   10       252.532 ±     16.077  ns/op
+TestBenchmark.monoGenerationAverage      avgt   10        33.047 ±      2.946  ns/op
+TestBenchmark.uuidGenerationAverage      avgt   10       309.880 ±     21.506  ns/op
+```

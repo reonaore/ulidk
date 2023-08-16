@@ -1,6 +1,9 @@
 plugins {
+    java
     kotlin("jvm") version "1.9.0"
+    kotlin("plugin.allopen") version "1.9.0"
     id("org.jetbrains.dokka") version "1.8.20"
+    id("me.champeau.jmh") version "0.7.1"
 }
 
 repositories {
@@ -20,3 +23,8 @@ dependencies {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
+
+allOpen {
+    annotation("org.openjdk.jmh.annotations.State")
+}
+
