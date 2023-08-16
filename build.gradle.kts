@@ -6,6 +6,9 @@ plugins {
     id("me.champeau.jmh") version "0.7.1"
 }
 
+group = "io.github.reonaore"
+version = "0.0.1"
+
 repositories {
     mavenCentral()
 }
