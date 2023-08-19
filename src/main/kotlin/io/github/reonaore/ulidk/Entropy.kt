@@ -21,6 +21,7 @@ internal class Entropy(
          * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
          * @param byteList
          */
+        @Suppress("MagicNumber")
         fun fromDecodedBytes(byteList: List<Long>): Entropy {
             val msb = EntropyValue.fromDecodedBytes(byteList.subList(0, 8))
             val lsb = EntropyValue.fromDecodedBytes(byteList.subList(8, 16))
@@ -46,7 +47,9 @@ internal class Entropy(
         val l = lsb.inc()
         val m = if (l.value == 0L) {
             msb.inc()
-        } else msb
+        } else {
+            msb
+        }
         return Entropy(m, l)
     }
 
@@ -110,6 +113,7 @@ internal class EntropyValue(value: Long) {
          * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
          * @param byteList
          */
+        @Suppress("MagicNumber")
         fun fromDecodedBytes(byteList: List<Long>): EntropyValue {
             var chunk = 0L
             // 35 = (chunk string length (8) - 1) * 5 bit
@@ -118,7 +122,6 @@ internal class EntropyValue(value: Long) {
             }
             return EntropyValue(chunk)
         }
-
     }
 
     operator fun inc(): EntropyValue = EntropyValue(value + 1)
@@ -128,6 +131,7 @@ internal class EntropyValue(value: Long) {
     /**
      * Write the value as binary
      */
+    @Suppress("MagicNumber")
     fun write(buf: ByteBuffer) {
         for (shiftBits in 32 downTo 0 step BYTE_BITS) {
             buf.put(((value ushr shiftBits) and 0xff).toByte())

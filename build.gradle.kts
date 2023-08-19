@@ -3,13 +3,16 @@ plugins {
     kotlin("plugin.allopen") version "1.9.0"
     id("org.jetbrains.dokka") version "1.8.20"
     id("me.champeau.jmh") version "0.7.1"
+    id("io.gitlab.arturbosch.detekt") version "1.23.1"
     id("maven-publish")
     signing
 }
 
 group = "io.github.reonaore"
 version = "0.0.1-SNAPSHOT"
+
 val isRelease = !version.toString().endsWith("SNAPSHOT")
+
 repositories {
     mavenCentral()
 }
@@ -31,7 +34,6 @@ tasks.withType<Test>().configureEach {
 allOpen {
     annotation("org.openjdk.jmh.annotations.State")
 }
-
 
 val dokkaHtmlJar by tasks.creating(Jar::class) {
     dependsOn(tasks.dokkaHtml)

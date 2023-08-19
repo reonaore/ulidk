@@ -15,6 +15,7 @@ internal class Timestamp(
         private const val BIT_MASK = 0xffffffffffff
         private const val BIT_SIZE = 48
 
+        @Suppress("MagicNumber")
         fun fromDecodedBytes(byteList: List<Long>): Timestamp {
             var timestamp = 0L
             // 45 = (timestamp string length (10) - 1) * 5 bit
@@ -24,6 +25,7 @@ internal class Timestamp(
             return Timestamp(timestamp and BIT_MASK)
         }
 
+        @Suppress("MagicNumber")
         fun fromBinary(bin: ByteArray): Timestamp {
             var timestamp = 0L
             (BIT_SIZE - BYTE_BITS downTo 0 step BYTE_BITS).forEachIndexed { index, shiftBits ->
@@ -33,6 +35,7 @@ internal class Timestamp(
         }
     }
 
+    @Suppress("MagicNumber")
     fun writeBase32(buf: ByteBuffer) {
         // 45 = (timestamp string length (10) - 1) * 5 bit
         for (shiftBits in 45 downTo 0 step ULID.BIT_NUM) {
@@ -40,6 +43,7 @@ internal class Timestamp(
         }
     }
 
+    @Suppress("MagicNumber")
     fun write(buf: ByteBuffer) {
         for (shiftBites in 40 downTo 0 step BYTE_BITS) {
             buf.put(((value ushr shiftBites and 0xff).toByte()))
