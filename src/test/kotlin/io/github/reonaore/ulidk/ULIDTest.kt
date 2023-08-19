@@ -10,7 +10,7 @@ class ULIDTest : FunSpec({
 
     test("generate") {
         val ulid = ULID.randomULID().toString()
-        val got = ULID.fromString(ulid).getOrThrow().toString()
+        val got = ULID.fromString(ulid).toString()
         ulid shouldBe got
     }
 
@@ -27,7 +27,7 @@ class ULIDTest : FunSpec({
     }
 
     test("decode") {
-        val testee = ULID.fromString("01H7PN3EH10123456789ABCDEF").getOrThrow()
+        val testee = ULID.fromString("01H7PN3EH10123456789ABCDEF")
         testee.timestamp() shouldBe 1691903703585L
         testee.entropy() shouldBe listOf(
             0x00,
@@ -45,13 +45,13 @@ class ULIDTest : FunSpec({
 
     test("decode max value") {
         val input = "7ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-        val got = ULID.fromString(input).getOrThrow().toString()
+        val got = ULID.fromString(input).toString()
 
         got shouldBe input
     }
     test("decode overflow value") {
         val input = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-        val got = ULID.fromString(input).getOrThrow().toString()
+        val got = ULID.fromString(input).toString()
 
         got shouldBe "0ZZZZZZZZZZZZZZZZZZZZZZZZZ"
     }
@@ -66,13 +66,13 @@ class ULIDTest : FunSpec({
     }
     context("monotonic") {
         test("normal") {
-            val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY").getOrThrow()
+            val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY")
             val ulidGen = ULID.MonotonicGenerator(input)
             ulidGen().toString() shouldBe "01BX5ZZKBKACTAV9WEVGEMMVRZ"
             ulidGen().toString() shouldBe "01BX5ZZKBKACTAV9WEVGEMMVS0"
         }
         test("edge case") {
-            val ulidGen = ULID.MonotonicGenerator(ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY").getOrThrow())
+            val ulidGen = ULID.MonotonicGenerator(ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY"))
             ulidGen().toString() shouldBe "01BX5ZZKBKZZZZZZZZZZZZZZZZ"
             runCatching {
                 ulidGen().toString()
@@ -84,16 +84,14 @@ class ULIDTest : FunSpec({
         val testUUID = "0189F43F-638C-E637-8CAE-422318BD567E"
         val testULID = "01H7T3YRWCWRVRSBJ24CCBTNKY"
         test("to uuid") {
-            val ulid = ULID.fromString(testULID).getOrThrow()
+            val ulid = ULID.fromString(testULID)
             val buf = ByteBuffer.wrap(ulid.binary)
             val uuid = UUID(buf.getLong(), buf.getLong())
             uuid.toString().uppercase(Locale.getDefault()) shouldBe testUUID
         }
         test("from uuid") {
             val ulid = ULID.fromUUID(UUID.fromString(testUUID))
-            ulid.toString() shouldBe ULID.fromString(testULID).getOrThrow().toString()
+            ulid.toString() shouldBe ULID.fromString(testULID).toString()
         }
     }
-
-
 })

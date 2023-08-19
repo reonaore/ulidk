@@ -43,20 +43,19 @@ class ULID internal constructor(
          * Decode ULID from Base32 encoded string.
          * @param str Base32 encoded string.
          * @return Decoded ULID if the string is valid
+         * @throws IllegalArgumentException
          */
-        fun fromString(str: String): Result<ULID> {
-            if (str.length != STRING_LENGTH) {
-                return Result.failure(IllegalArgumentException("String length must be $STRING_LENGTH"))
-            }
+        @Suppress("MagicNumber")
+        fun fromString(str: String): ULID {
+            require(str.length == STRING_LENGTH) { "String length must be $STRING_LENGTH" }
+
             val byteList = str.toList().map {
                 base32LookUp[it]?.and(BIT_MASK)
-                    ?: return Result.failure(IllegalArgumentException("Input string has some invalid chars"))
+                    ?: throw IllegalArgumentException("Input string has some invalid chars")
             }
-            return Result.success(
-                ULID(
-                    timestamp = Timestamp.fromDecodedBytes(byteList.subList(0, 10)),
-                    entropy = Entropy.fromDecodedBytes(byteList.subList(10, 26)),
-                )
+            return ULID(
+                timestamp = Timestamp.fromDecodedBytes(byteList.subList(0, 10)),
+                entropy = Entropy.fromDecodedBytes(byteList.subList(10, 26)),
             )
         }
 
@@ -66,7 +65,6 @@ class ULID internal constructor(
             val entropy = Entropy.fromBinary(bin.sliceArray(TIMESTAMP_BINARY_SIZE until BINARY_SIZE))
             return ULID(timestamp, entropy)
         }
-
 
         /**
          * Generates ULID from UUID
@@ -119,7 +117,6 @@ class ULID internal constructor(
                 timestamp.write(this)
                 entropy.write(this)
             }.array()
-
 
     private fun generateString(): String {
         val b = ByteArray(STRING_LENGTH)

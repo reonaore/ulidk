@@ -1,6 +1,15 @@
 package io.github.reonaore.ulidk
 
-import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.BenchmarkMode
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Mode
+import org.openjdk.jmh.annotations.OutputTimeUnit
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.Setup
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -50,19 +59,18 @@ class TestBenchmark {
         return monoULID.toString()
     }
 
-
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
     @OutputTimeUnit(TimeUnit.SECONDS)
     fun decodeThroughput(): String {
-        return ULID.fromString(ulidString).getOrThrow().toString()
+        return ULID.fromString(ulidString).toString()
     }
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
     @OutputTimeUnit(TimeUnit.NANOSECONDS)
     fun decodeAverage(): String {
-        return ULID.fromString(ulidString).getOrThrow().toString()
+        return ULID.fromString(ulidString).toString()
     }
 
     @Benchmark
