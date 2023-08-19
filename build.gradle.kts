@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.reonaore"
-version = "0.0.1-SNAPSHOT"
+version = "0.1.0-SNAPSHOT"
 
 val isRelease = !version.toString().endsWith("SNAPSHOT")
 
