@@ -4,6 +4,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import java.nio.ByteBuffer
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 class ULIDTest : FunSpec({
@@ -93,5 +95,11 @@ class ULIDTest : FunSpec({
             val ulid = ULID.fromUUID(UUID.fromString(testUUID))
             ulid.toString() shouldBe ULID.fromString(testULID).toString()
         }
+    }
+    context("timestamp") {
+        val timestamp = OffsetDateTime.of(2000, 1, 2, 3, 4, 5, 0, ZoneOffset.UTC)
+        val testULID = ULID.randomULID(timestamp = timestamp.toInstant().toEpochMilli())
+        testULID.offsetDateTime() shouldBe timestamp
+        testULID.instant() shouldBe timestamp.toInstant()
     }
 })

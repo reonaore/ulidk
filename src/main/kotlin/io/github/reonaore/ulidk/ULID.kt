@@ -2,6 +2,9 @@ package io.github.reonaore.ulidk
 
 import java.nio.ByteBuffer
 import java.security.SecureRandom
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 /**
@@ -105,6 +108,18 @@ class ULID internal constructor(
      * @return unix time of the ULID
      */
     fun timestamp(): Long = timestamp.value
+
+    /**
+     * @return timestamp as Instant
+     */
+    fun instant(): Instant = Instant.ofEpochMilli(timestamp.value)
+
+    /**
+     * @param zoneOffset zone offset for OffsetDateTime. Default is UTC.
+     * @return timestamp as OffsetDateTime
+     */
+    fun offsetDateTime(zoneOffset: ZoneOffset = ZoneOffset.UTC): OffsetDateTime =
+        OffsetDateTime.ofInstant(instant(), zoneOffset)
 
     /**
      * @return randomness of the ULID
