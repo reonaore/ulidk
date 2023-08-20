@@ -12,6 +12,8 @@ $dokka.location:io.github.reonaore.ulidk/ULID///PointingToDeclaration/ulidk/io.
 $dokka.location:io.github.reonaore.ulidk/ULID/binary/#/PointingToDeclaration/ulidk/io.github.reonaore.ulidk/-u-l-i-d/binary.html
 $dokka.location:io.github.reonaore.ulidk/ULID/compareTo/#io.github.reonaore.ulidk.ULID/PointingToDeclaration/ulidk/io.github.reonaore.ulidk/-u-l-i-d/compare-to.html
 $dokka.location:io.github.reonaore.ulidk/ULID/entropy/#/PointingToDeclaration/ulidk/io.github.reonaore.ulidk/-u-l-i-d/entropy.html
+$dokka.location:io.github.reonaore.ulidk/ULID/instant/#/PointingToDeclaration/ulidk/io.github.reonaore.ulidk/-u-l-i-d/instant.html
+$dokka.location:io.github.reonaore.ulidk/ULID/offsetDateTime/#java.time.ZoneOffset/PointingToDeclaration/ulidk/io.github.reonaore.ulidk/-u-l-i-d/offset-date-time.html
 $dokka.location:io.github.reonaore.ulidk/ULID/timestamp/#/PointingToDeclaration/ulidk/io.github.reonaore.ulidk/-u-l-i-d/timestamp.html
 $dokka.location:io.github.reonaore.ulidk/ULID/toString/#/PointingToDeclaration/ulidk/io.github.reonaore.ulidk/-u-l-i-d/to-string.html
 $dokka.location:io.github.reonaore.ulidk/ULID/toUUID/#/PointingToDeclaration/ulidk/io.github.reonaore.ulidk/-u-l-i-d/to-u-u-i-d.html
