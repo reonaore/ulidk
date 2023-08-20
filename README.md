@@ -6,7 +6,31 @@ See [kDoc](https://reonaore.github.io/ulidk/) to see the specification.
 
 # Install
 
-TODO
+## Kotlin DSL
+
+Add maven repository.
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+```
+
+If you want to use snapshots, add another repository.
+
+```kotlin
+repositories {
+    maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    }
+}
+```
+
+Add dependency.
+
+```kotlin
+ implementation("io.github.reonaore:ulidk:0.1.0")
+```
 
 # Usage
 
