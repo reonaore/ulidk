@@ -1,9 +1,9 @@
 package io.github.reonaore.ulidk
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
-import java.nio.ByteBuffer
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -27,36 +27,49 @@ class ULIDTest : FunSpec({
         got.first() shouldBe first
         got[1] shouldBe second
     }
+    context("decode") {
+        test("success") {
+            val testee = ULID.fromString("01H7PN3EH10123456789ABCDEF")
+            testee.timestamp() shouldBe 1691903703585L
+            testee.entropy() shouldBe listOf(
+                0x00,
+                0x44,
+                0x32,
+                0x14,
+                0xc7,
+                0x42,
+                0x54,
+                0xB6,
+                0x35,
+                0xcf,
+            ).map { it.toByte() }
+        }
 
-    test("decode") {
-        val testee = ULID.fromString("01H7PN3EH10123456789ABCDEF")
-        testee.timestamp() shouldBe 1691903703585L
-        testee.entropy() shouldBe listOf(
-            0x00,
-            0x44,
-            0x32,
-            0x14,
-            0xc7,
-            0x42,
-            0x54,
-            0xB6,
-            0x35,
-            0xcf,
-        ).map { it.toByte() }
+        test("max value") {
+            val input = "7ZZZZZZZZZZZZZZZZZZZZZZZZZ"
+            val got = ULID.fromString(input).toString()
+
+            got shouldBe input
+        }
+        test("overflow value") {
+            val input = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
+            val got = ULID.fromString(input).toString()
+
+            got shouldBe "0ZZZZZZZZZZZZZZZZZZZZZZZZZ"
+        }
+        test("invalid string length") {
+            shouldThrow<IllegalArgumentException> {
+                ULID.fromString("1")
+            }
+        }
+        test("string has invalid characters") {
+            shouldThrow<IllegalArgumentException> {
+                ULID.fromString("??????????????????????????")
+            }
+        }
     }
 
-    test("decode max value") {
-        val input = "7ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-        val got = ULID.fromString(input).toString()
 
-        got shouldBe input
-    }
-    test("decode overflow value") {
-        val input = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-        val got = ULID.fromString(input).toString()
-
-        got shouldBe "0ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-    }
 
     test("binary order") {
         val entropy = ByteArray(10) {
@@ -87,8 +100,7 @@ class ULIDTest : FunSpec({
         val testULID = "01H7T3YRWCWRVRSBJ24CCBTNKY"
         test("to uuid") {
             val ulid = ULID.fromString(testULID)
-            val buf = ByteBuffer.wrap(ulid.binary)
-            val uuid = UUID(buf.getLong(), buf.getLong())
+            val uuid = ulid.toUUID()
             uuid.toString().uppercase(Locale.getDefault()) shouldBe testUUID
         }
         test("from uuid") {
