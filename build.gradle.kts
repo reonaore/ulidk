@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.8.20"
     id("me.champeau.jmh") version "0.7.1"
     id("io.gitlab.arturbosch.detekt") version "1.23.1"
+    id("org.jetbrains.kotlinx.kover") version "0.7.3"
     id("maven-publish")
     signing
 }
@@ -29,6 +30,12 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+}
+
+kover {
+    excludeSourceSets {
+        names("jmh")
+    }
 }
 
 allOpen {
