@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.10"
     kotlin("plugin.allopen") version "1.9.10"
-    id("org.jetbrains.dokka") version "1.8.20"
+    id("org.jetbrains.dokka") version "1.9.0"
     id("me.champeau.jmh") version "0.7.1"
     id("io.gitlab.arturbosch.detekt") version "1.23.1"
     id("org.jetbrains.kotlinx.kover") version "0.7.3"
