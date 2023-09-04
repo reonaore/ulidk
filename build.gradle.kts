@@ -18,7 +18,7 @@ repositories {
     mavenCentral()
 }
 
-val kotestVersion = "5.6.2"
+val kotestVersion = "5.7.1"
 
 dependencies {
     testImplementation(kotlin("test"))
