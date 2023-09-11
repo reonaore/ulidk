@@ -25,7 +25,7 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("io.kotest:kotest-property:$kotestVersion")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.1")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.2")
 }
 
 tasks.withType<Test>().configureEach {
