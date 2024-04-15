@@ -3,7 +3,7 @@ plugins {
     kotlin("plugin.allopen") version "1.9.23"
     id("org.jetbrains.dokka") version "1.9.10"
     id("me.champeau.jmh") version "0.7.2"
-    id("io.gitlab.arturbosch.detekt") version "1.23.5"
+    id("io.gitlab.arturbosch.detekt") version "1.23.6"
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
     id("maven-publish")
     signing
