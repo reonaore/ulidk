@@ -17,3 +17,5 @@ out
 *.iml
 
 .DS_Store
+
+.kotlin
