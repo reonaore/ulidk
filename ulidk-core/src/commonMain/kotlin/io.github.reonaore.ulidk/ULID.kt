@@ -161,9 +161,14 @@ class ULID internal constructor(
         return str == other.str
     }
 
+    override fun hashCode(): Int {
+        return str.hashCode()
+    }
+
     @OptIn(ExperimentalUuidApi::class)
     fun toUUID(): Uuid {
         val buf = binary
         return Uuid.fromLongs(buf.readLong(), buf.readLong())
     }
+
 }
