@@ -1,10 +1,10 @@
 plugins {
-    kotlin("multiplatform") version "2.1.20"
-    kotlin("plugin.allopen") version "2.1.20"
-    id("org.jetbrains.dokka") version "2.0.0"
-    id("io.gitlab.arturbosch.detekt") version "1.23.6"
-    id("org.jetbrains.kotlinx.kover") version "0.7.6"
-    id("io.kotest.multiplatform") version "5.8.1"
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.allopen)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.kover)
+    alias(libs.plugins.kotest.multiplatform)
     id("maven-publish")
     signing
 }
@@ -18,17 +18,15 @@ repositories {
     mavenCentral()
 }
 
-val kotestVersion = "5.8.1"
-
 kotlin {
     jvm {
         tasks.withType<Test>().configureEach {
             useJUnitPlatform()
         }
     }
-    js(IR) { // LEGACY or BOTH are unsupported
-        browser() // to compile for the web
-        nodejs() // to compile against node
+    js(IR) {
+        browser()
+        nodejs()
     }
 
     compilerOptions {
@@ -38,28 +36,27 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.7.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+                implementation(libs.kotlinx.io.core)
+                implementation(libs.kotlinx.datetime)
             }
         }
         commonTest {
             dependencies {
-                implementation("io.kotest:kotest-property:${kotestVersion}")
-                implementation("io.kotest:kotest-assertions-core:${kotestVersion}")
-                implementation("io.kotest:kotest-framework-engine:${kotestVersion}")
+                implementation(libs.kotest.property)
+                implementation(libs.kotest.assertions.core)
+                implementation(libs.kotest.framework.engine)
             }
         }
-
         jvmTest {
             dependencies {
-                implementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-                implementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
+                implementation(libs.kotest.runner.junit5)
+                implementation(libs.kotest.runner.junit5.jvm)
             }
         }
     }
 }
 
-
+// Dokka tasks
 val dokkaHtmlJar by tasks.registering(Jar::class) {
     dependsOn("dokkaHtml")
     from(layout.buildDirectory.dir("dokka/html"))
@@ -72,16 +69,18 @@ val dokkaJavadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
 }
 
+// Publishing
 publishing {
     publications {
         create<MavenPublication>("ulidk") {
             from(components["kotlin"])
-            artifact(dokkaJavadocJar)
             artifact(dokkaHtmlJar)
+            artifact(dokkaJavadocJar)
 
-            groupId = project.group as String
+            groupId = project.group.toString()
             artifactId = project.name
-            version = project.version as String
+            version = project.version.toString()
+
             pom {
                 name.set("${project.group}:${project.name}")
                 description.set("ULID implementation in Kotlin")
