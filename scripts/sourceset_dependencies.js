@@ -1,1 +1,1 @@
-sourceset_dependencies='{":dokkaHtml/main":[]}'
+sourceset_dependencies='{":ulidk-core:dokkaHtml/commonMain":[],":ulidk-core:dokkaHtml/jsMain":[":ulidk-core:dokkaHtml/commonMain"],":ulidk-core:dokkaHtml/jvmMain":[":ulidk-core:dokkaHtml/commonMain"]}'

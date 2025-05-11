@@ -1,0 +1,29 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:io.github.reonaore.ulidk.internal////PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/index.html
+$dokka.location:io.github.reonaore.ulidk.internal//getSecureRandomGenerator/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/get-secure-random-generator.html
+$dokka.location:io.github.reonaore.ulidk.internal/InSecureRandomGenerator///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-in-secure-random-generator/index.html
+$dokka.location:io.github.reonaore.ulidk.internal/InSecureRandomGenerator/nextBytes/#kotlin.Int/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-in-secure-random-generator/next-bytes.html
+$dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGenerator///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator/index.html
+$dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGenerator/nextBytes/#kotlin.Int/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator/next-bytes.html
+$dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGeneratorImpl///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator-impl/index.html
+$dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGeneratorImpl/nextBytes/#kotlin.Int/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator-impl/next-bytes.html
+$dokka.location:io.github.reonaore.ulidk////PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/index.html
+$dokka.location:io.github.reonaore.ulidk/ULID.Companion///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-companion/index.html
+$dokka.location:io.github.reonaore.ulidk/ULID.Companion/fromString/#kotlin.String/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-companion/from-string.html
+$dokka.location:io.github.reonaore.ulidk/ULID.Companion/fromUUID/#kotlin.uuid.Uuid/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-companion/from-u-u-i-d.html
+$dokka.location:io.github.reonaore.ulidk/ULID.Companion/randomULID/#kotlin.Long#io.github.reonaore.ulidk.internal.SecureRandomGenerator/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-companion/random-u-l-i-d.html
+$dokka.location:io.github.reonaore.ulidk/ULID.MonotonicGenerator///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-monotonic-generator/index.html
+$dokka.location:io.github.reonaore.ulidk/ULID.MonotonicGenerator/MonotonicGenerator/#io.github.reonaore.ulidk.ULID/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-monotonic-generator/-monotonic-generator.html
+$dokka.location:io.github.reonaore.ulidk/ULID.MonotonicGenerator/invoke/#kotlin.Long/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-monotonic-generator/invoke.html
+$dokka.location:io.github.reonaore.ulidk/ULID///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/index.html
+$dokka.location:io.github.reonaore.ulidk/ULID/binary/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/binary.html
+$dokka.location:io.github.reonaore.ulidk/ULID/compareTo/#io.github.reonaore.ulidk.ULID/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/compare-to.html
+$dokka.location:io.github.reonaore.ulidk/ULID/entropy/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/entropy.html
+$dokka.location:io.github.reonaore.ulidk/ULID/equals/#kotlin.Any?/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/equals.html
+$dokka.location:io.github.reonaore.ulidk/ULID/instant/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/instant.html
+$dokka.location:io.github.reonaore.ulidk/ULID/timestamp/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/timestamp.html
+$dokka.location:io.github.reonaore.ulidk/ULID/toString/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/to-string.html
+$dokka.location:io.github.reonaore.ulidk/ULID/toUUID/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/to-u-u-i-d.html
+io.github.reonaore.ulidk
+io.github.reonaore.ulidk.internal
