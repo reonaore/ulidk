@@ -1,5 +1,5 @@
 ![build](https://github.com/reonaore/ulidk/actions/workflows/build.yaml/badge.svg)
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.1.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/reonaore/ulidk/graph/badge.svg?token=27FPKJM9IU)](https://codecov.io/gh/reonaore/ulidk)
 
