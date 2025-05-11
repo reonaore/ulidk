@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.1.20"
-    id("me.champeau.jmh") version "0.7.2"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.jmh)
 }
 
 repositories {
@@ -8,9 +8,9 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":ulidk-core")) // MPPモジュールを参照
-    implementation("org.openjdk.jmh:jmh-core:1.37")
-    annotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.37")
+    implementation(project(":ulidk-core")) // MPP module reference
+    implementation(libs.jmh.core)
+    annotationProcessor(libs.jmh.generator)
 }
 
 jmh {
