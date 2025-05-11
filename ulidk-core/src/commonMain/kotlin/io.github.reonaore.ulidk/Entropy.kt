@@ -153,10 +153,4 @@ internal class EntropyValue(value: Long) {
      * @return true if the value is 40bits all high
      */
     fun isFull(): Boolean = value == BIT_MASK
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is EntropyValue) return false
-        return value == other.value
-    }
 }
