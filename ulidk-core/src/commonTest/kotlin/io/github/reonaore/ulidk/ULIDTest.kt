@@ -9,8 +9,11 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import kotlinx.datetime.Clock
 import kotlinx.io.readByteArray
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+
 
 @OptIn(ExperimentalUuidApi::class)
 class ULIDTest : FunSpec({
@@ -105,5 +108,27 @@ class ULIDTest : FunSpec({
         val timestamp = Clock.System.now()
         val testULID = ULID.randomULID(timestamp = timestamp.toEpochMilliseconds())
         testULID.instant().toEpochMilliseconds() shouldBe timestamp.toEpochMilliseconds()
+    }
+
+    test("serializer") {
+        @Serializable
+        data class TestObject(val v: ULID)
+
+        val ulid = ULID.randomULID()
+        val testee = TestObject(ulid)
+        val json = """{"v":"$ulid"}"""
+        Json.encodeToString(testee) shouldBe json
+        Json.decodeFromString<TestObject>(json) shouldBe testee
+
+        ULID.serializer().descriptor.serialName shouldBe "io.github.reonaore.ulidk.ULID"
+    }
+    test("equality") {
+        val ulid = ULID.randomULID()
+        (ulid == ulid) shouldBe true
+        (ulid == ULID.randomULID()) shouldBe false
+        (ulid == ULID.fromString(ulid.toString())).shouldBeTrue()
+        // hash
+        (ulid.hashCode() == ULID.fromString(ulid.toString()).hashCode()).shouldBeTrue()
+        (ulid.hashCode() == ULID.hashCode()) shouldBe false
     }
 })

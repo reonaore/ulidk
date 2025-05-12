@@ -8,6 +8,12 @@ import kotlinx.io.Buffer
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import kotlinx.io.readString
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -17,6 +23,7 @@ import kotlin.uuid.Uuid
  * @property entropy the randomness of the ULID
  * @property binary the binary of the ULID. It has 128 bits.
  */
+@Serializable(with = ULID.Serializer::class)
 class ULID internal constructor(
     private val timestamp: Timestamp,
     private val entropy: Entropy,
@@ -113,6 +120,21 @@ class ULID internal constructor(
         }
     }
 
+    object Serializer : KSerializer<ULID> {
+        override val descriptor = PrimitiveSerialDescriptor(
+            serialName = "io.github.reonaore.ulidk.ULID",
+            kind = PrimitiveKind.STRING
+        )
+
+        override fun serialize(encoder: Encoder, value: ULID) {
+            encoder.encodeString(value.str)
+        }
+
+        override fun deserialize(decoder: Decoder): ULID {
+            return fromString(decoder.decodeString())
+        }
+    }
+
     /**
      * @return unix time of the ULID
      */
@@ -161,9 +183,14 @@ class ULID internal constructor(
         return str == other.str
     }
 
+    override fun hashCode(): Int {
+        return str.hashCode()
+    }
+
     @OptIn(ExperimentalUuidApi::class)
     fun toUUID(): Uuid {
         val buf = binary
         return Uuid.fromLongs(buf.readLong(), buf.readLong())
     }
+
 }
