@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
     alias(libs.plugins.kotest.multiplatform)
+    alias(libs.plugins.kotlinx.serialization)
     id("maven-publish")
     signing
 }
@@ -38,6 +39,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.io.core)
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
         commonTest {
