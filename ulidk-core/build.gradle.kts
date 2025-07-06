@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     alias(libs.plugins.kotlin.allopen)
@@ -6,14 +8,12 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.kotest.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
-    id("maven-publish")
+    alias(libs.plugins.publish)
     signing
 }
 
 group = "io.github.reonaore"
 version = "0.2.0"
-
-val isRelease = !version.toString().endsWith("SNAPSHOT")
 
 repositories {
     mavenCentral()
@@ -58,73 +58,35 @@ kotlin {
     }
 }
 
-// Dokka tasks
-val dokkaHtmlJar by tasks.registering(Jar::class) {
-    dependsOn("dokkaHtml")
-    from(layout.buildDirectory.dir("dokka/html"))
-    archiveClassifier.set("html-docs")
-}
-
-val dokkaJavadocJar by tasks.registering(Jar::class) {
-    dependsOn("dokkaJavadoc")
-    from(layout.buildDirectory.dir("dokka/javadoc"))
-    archiveClassifier.set("javadoc")
-}
-
-// Publishing
-publishing {
-    publications {
-        create<MavenPublication>("ulidk") {
-            from(components["kotlin"])
-            artifact(dokkaHtmlJar)
-            artifact(dokkaJavadocJar)
-
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-
-            pom {
-                name.set("${project.group}:${project.name}")
-                description.set("ULID implementation in Kotlin")
-                url.set("https://github.com/reonaore/ulidk")
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("http://www.opensource.org/licenses/mit-license.php")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("onare")
-                        name.set("Leona Shiode")
-                        email.set("reona.ookikunaru@gmail.com")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/reonaore/ulidk.git")
-                    developerConnection.set("scm:git:ssh://github.com/reonaore/ulidk.git")
-                    url.set("https://github.com/reonaore/ulidk")
-                }
+mavenPublishing {
+    coordinates(project.group.toString(), project.name, project.version.toString())
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+    pom {
+        name.set("${project.group}:${project.name}")
+        description.set("ULID implementation in Kotlin")
+        url.set("https://github.com/reonaore/ulidk")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("http://www.opensource.org/licenses/mit-license.php")
             }
         }
-    }
-
-    repositories {
-        maven {
-            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            name = "OSSRH"
-            url = if (!isRelease) snapshotsRepoUrl else releasesRepoUrl
-
-            credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
+        developers {
+            developer {
+                id.set("onare")
+                name.set("Leona Shiode")
+                email.set("reona.ookikunaru@gmail.com")
             }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/reonaore/ulidk.git")
+            developerConnection.set("scm:git:ssh://github.com/reonaore/ulidk.git")
+            url.set("https://github.com/reonaore/ulidk")
         }
     }
 }
 
 signing {
     useGpgCmd()
-    sign(publishing.publications["ulidk"])
 }
