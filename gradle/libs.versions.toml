@@ -9,6 +9,7 @@ kotlinx-datetime = "0.6.2"
 kotlinx-serialization = "1.8.1"
 jmh = "1.37"
 jmh-plugin = "0.7.3"
+jreleaser = "1.19.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -21,6 +22,7 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 jmh = { id = "me.champeau.jmh", version.ref = "jmh-plugin" }
+jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
 
 [libraries]
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }

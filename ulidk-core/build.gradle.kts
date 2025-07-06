@@ -1,3 +1,5 @@
+import org.jreleaser.model.Active
+
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     alias(libs.plugins.kotlin.allopen)
@@ -7,11 +9,12 @@ plugins {
     alias(libs.plugins.kotest.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
     id("maven-publish")
+    alias(libs.plugins.jreleaser)
     signing
 }
 
 group = "io.github.reonaore"
-version = "0.2.0"
+version = "0.2.0-SNAPSHOT"
 
 val isRelease = !version.toString().endsWith("SNAPSHOT")
 
@@ -60,15 +63,39 @@ kotlin {
 
 // Dokka tasks
 val dokkaHtmlJar by tasks.registering(Jar::class) {
-    dependsOn("dokkaHtml")
+    dependsOn("dokkaGenerate")
     from(layout.buildDirectory.dir("dokka/html"))
-    archiveClassifier.set("html-docs")
+    archiveClassifier = "html-docs"
 }
 
-val dokkaJavadocJar by tasks.registering(Jar::class) {
-    dependsOn("dokkaJavadoc")
-    from(layout.buildDirectory.dir("dokka/javadoc"))
-    archiveClassifier.set("javadoc")
+jreleaser {
+    signing {
+        active = Active.ALWAYS
+        armored = true
+    }
+    deploy {
+        active = Active.RELEASE
+        maven {
+            mavenCentral {
+                register("release-deploy") {
+                    active = Active.RELEASE
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
+                }
+            }
+            nexus2 {
+                register("snapshot-deploy") {
+                    active = Active.SNAPSHOT
+                    snapshotUrl = "https://central.sonatype.com/repository/maven-snapshots/"
+                    applyMavenCentralRules = true
+                    snapshotSupported = true
+                    closeRepository = true
+                    releaseRepository = true
+                    stagingRepository("build/staging-deploy")
+                }
+            }
+        }
+    }
 }
 
 // Publishing
@@ -77,7 +104,6 @@ publishing {
         create<MavenPublication>("ulidk") {
             from(components["kotlin"])
             artifact(dokkaHtmlJar)
-            artifact(dokkaJavadocJar)
 
             groupId = project.group.toString()
             artifactId = project.name
@@ -111,15 +137,7 @@ publishing {
 
     repositories {
         maven {
-            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            name = "OSSRH"
-            url = if (!isRelease) snapshotsRepoUrl else releasesRepoUrl
-
-            credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
-            }
+            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
         }
     }
 }
