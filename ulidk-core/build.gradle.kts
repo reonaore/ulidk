@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
+    id("org.jetbrains.kotlin.multiplatform")
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.dokka)
     alias(libs.plugins.detekt)
