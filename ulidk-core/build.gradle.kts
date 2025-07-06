@@ -1,4 +1,4 @@
-import org.jreleaser.model.Active
+import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
@@ -8,15 +8,12 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.kotest.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
-    id("maven-publish")
-    alias(libs.plugins.jreleaser)
+    alias(libs.plugins.publish)
     signing
 }
 
 group = "io.github.reonaore"
-version = "0.2.0-SNAPSHOT"
-
-val isRelease = !version.toString().endsWith("SNAPSHOT")
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -61,88 +58,35 @@ kotlin {
     }
 }
 
-// Dokka tasks
-val dokkaHtmlJar by tasks.registering(Jar::class) {
-    dependsOn("dokkaGenerate")
-    from(layout.buildDirectory.dir("dokka/html"))
-    archiveClassifier = "html-docs"
-}
-
-jreleaser {
-    signing {
-        active = Active.ALWAYS
-        armored = true
-    }
-    deploy {
-        active = Active.RELEASE
-        maven {
-            mavenCentral {
-                register("release-deploy") {
-                    active = Active.RELEASE
-                    url = "https://central.sonatype.com/api/v1/publisher"
-                    stagingRepository("build/staging-deploy")
-                }
-            }
-            nexus2 {
-                register("snapshot-deploy") {
-                    active = Active.SNAPSHOT
-                    snapshotUrl = "https://central.sonatype.com/repository/maven-snapshots/"
-                    applyMavenCentralRules = true
-                    snapshotSupported = true
-                    closeRepository = true
-                    releaseRepository = true
-                    stagingRepository("build/staging-deploy")
-                }
+mavenPublishing {
+    coordinates(project.group.toString(), project.name, project.version.toString())
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+    pom {
+        name.set("${project.group}:${project.name}")
+        description.set("ULID implementation in Kotlin")
+        url.set("https://github.com/reonaore/ulidk")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("http://www.opensource.org/licenses/mit-license.php")
             }
         }
-    }
-}
-
-// Publishing
-publishing {
-    publications {
-        create<MavenPublication>("ulidk") {
-            from(components["kotlin"])
-            artifact(dokkaHtmlJar)
-
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-
-            pom {
-                name.set("${project.group}:${project.name}")
-                description.set("ULID implementation in Kotlin")
-                url.set("https://github.com/reonaore/ulidk")
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("http://www.opensource.org/licenses/mit-license.php")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("onare")
-                        name.set("Leona Shiode")
-                        email.set("reona.ookikunaru@gmail.com")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/reonaore/ulidk.git")
-                    developerConnection.set("scm:git:ssh://github.com/reonaore/ulidk.git")
-                    url.set("https://github.com/reonaore/ulidk")
-                }
+        developers {
+            developer {
+                id.set("onare")
+                name.set("Leona Shiode")
+                email.set("reona.ookikunaru@gmail.com")
             }
         }
-    }
-
-    repositories {
-        maven {
-            url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
+        scm {
+            connection.set("scm:git:git://github.com/reonaore/ulidk.git")
+            developerConnection.set("scm:git:ssh://github.com/reonaore/ulidk.git")
+            url.set("https://github.com/reonaore/ulidk")
         }
     }
 }
 
 signing {
     useGpgCmd()
-    sign(publishing.publications["ulidk"])
 }
