@@ -14,7 +14,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Build Document
-        run: ./gradlew dokkaHtml
+        run: ./gradlew dokkaGenerate
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
