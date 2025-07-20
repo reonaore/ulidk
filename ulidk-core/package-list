@@ -2,11 +2,10 @@ $dokka.format:html-v1
 $dokka.linkExtension:html
 $dokka.location:io.github.reonaore.ulidk.internal////PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/index.html
 $dokka.location:io.github.reonaore.ulidk.internal//getSecureRandomGenerator/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/get-secure-random-generator.html
-$dokka.location:io.github.reonaore.ulidk.internal/InSecureRandomGenerator///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-in-secure-random-generator/index.html
-$dokka.location:io.github.reonaore.ulidk.internal/InSecureRandomGenerator/nextBytes/#kotlin.Int/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-in-secure-random-generator/next-bytes.html
 $dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGenerator///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator/index.html
 $dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGenerator/nextBytes/#kotlin.Int/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator/next-bytes.html
 $dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGeneratorImpl///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator-impl/index.html
+$dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGeneratorImpl/SecureRandomGeneratorImpl/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator-impl/-secure-random-generator-impl.html
 $dokka.location:io.github.reonaore.ulidk.internal/SecureRandomGeneratorImpl/nextBytes/#kotlin.Int/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk.internal/-secure-random-generator-impl/next-bytes.html
 $dokka.location:io.github.reonaore.ulidk////PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/index.html
 $dokka.location:io.github.reonaore.ulidk/ULID.Companion///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-companion/index.html
