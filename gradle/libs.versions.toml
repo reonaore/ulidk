@@ -10,6 +10,7 @@ kotlinx-serialization = "1.8.1"
 jmh = "1.37"
 jmh-plugin = "0.7.3"
 publish = "0.30.0"
+kotlincrypto = "0.5.1"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -34,6 +35,8 @@ kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-runner-junit5-jvm = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
+
+kotlincrypto-random-crypto-rand = { module = "org.kotlincrypto.random:crypto-rand", version.ref = "kotlincrypto" }
 
 jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
 jmh-generator = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }

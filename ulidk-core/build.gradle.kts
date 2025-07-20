@@ -40,6 +40,7 @@ kotlin {
                 implementation(libs.kotlinx.io.core)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlincrypto.random.crypto.rand)
             }
         }
         commonTest {
