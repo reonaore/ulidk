@@ -1,5 +1,3 @@
-import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     alias(libs.plugins.kotlin.allopen)
@@ -61,7 +59,6 @@ kotlin {
 
 mavenPublishing {
     coordinates(project.group.toString(), project.name, project.version.toString())
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
     pom {
         name.set("${project.group}:${project.name}")
