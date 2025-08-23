@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.0"
+kotlin = "2.1.21"
 dokka = "2.0.0"
 detekt = "1.23.8"
 kover = "0.9.1"
