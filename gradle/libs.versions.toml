@@ -7,8 +7,7 @@ kotest = "6.0.0-LOCAL"
 kotlinx-io = "0.8.0"
 kotlinx-datetime = "0.7.1-0.6.x-compat"
 kotlinx-serialization = "1.9.0"
-jmh = "1.37"
-jmh-plugin = "0.7.3"
+kotlinx-benchmark = "0.4.14"
 publish = "0.34.0"
 kotlincrypto = "0.6.0"
 androidGradlePlugin = "8.13.0"
@@ -24,8 +23,8 @@ android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-kotest-multiplatform = { id = "io.kotest.multiplatform", version.ref = "kotest" }
-jmh = { id = "me.champeau.jmh", version.ref = "jmh-plugin" }
+
+kotlinx-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinx-benchmark" }
 
 [libraries]
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
@@ -34,5 +33,4 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 
 kotlincrypto-random-crypto-rand = { module = "org.kotlincrypto.random:crypto-rand", version.ref = "kotlincrypto" }
 
-jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
-jmh-generator = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
+kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinx-benchmark" }
