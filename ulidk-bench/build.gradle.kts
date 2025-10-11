@@ -1,18 +1,31 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
-    alias(libs.plugins.jmh)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlinx.benchmark)
+    alias(libs.plugins.kotlin.allopen)
 }
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation(project(":ulidk-core")) // MPP module reference
-    implementation(libs.jmh.core)
-    annotationProcessor(libs.jmh.generator)
+kotlin {
+    jvm()
+    sourceSets {
+        commonMain {
+            dependencies {
+                api(project(":ulidk-core"))
+                implementation(libs.kotlinx.benchmark.runtime)
+            }
+        }
+    }
 }
 
-jmh {
-    duplicateClassesStrategy = DuplicatesStrategy.EXCLUDE
+allOpen {
+    annotation("org.openjdk.jmh.annotations.State")
+}
+
+benchmark {
+    targets {
+        register("jvm")
+    }
 }

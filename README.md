@@ -99,7 +99,7 @@ assert(uuid.toString() == ulid.toUUID().toString())
 ## Benchmark
 
 ```shell
-./gradlew jmh 
+./gradlew benchmark
 ```
 
 ### result
@@ -107,13 +107,13 @@ assert(uuid.toString() == ulid.toUUID().toString())
 on MacBook Air M1 2020, 8GB memory
 
 ```text
-Benchmark                                Mode  Cnt         Score        Error  Units
-TestBenchmark.decodeThroughput          thrpt   10   3303345.521 ± 149622.901  ops/s
-TestBenchmark.generationThroughput      thrpt   10   3933690.923 ± 269409.409  ops/s
-TestBenchmark.monoGenerationThroughput  thrpt   10  17405324.773 ± 716794.007  ops/s
-TestBenchmark.uuidGenerationThroughput  thrpt   10   3327425.975 ±  77265.741  ops/s
-TestBenchmark.decodeAverage              avgt   10       303.135 ±     13.585  ns/op
-TestBenchmark.generationAverage          avgt   10       252.532 ±     16.077  ns/op
-TestBenchmark.monoGenerationAverage      avgt   10        33.047 ±      2.946  ns/op
-TestBenchmark.uuidGenerationAverage      avgt   10       309.880 ±     21.506  ns/op
+Benchmark                                Mode  Cnt        Score         Error  Units
+TestBenchmark.decodeThroughput          thrpt    5  2870482.675 ±   28929.819  ops/s
+TestBenchmark.generationThroughput      thrpt    5  2222172.000 ±  337147.404  ops/s
+TestBenchmark.monoGenerationThroughput  thrpt    5  7301193.431 ± 2717363.333  ops/s
+TestBenchmark.uuidGenerationThroughput  thrpt    5  1997510.100 ± 2425175.330  ops/s
+TestBenchmark.decodeAverage              avgt    5      526.944 ±     926.595  ns/op
+TestBenchmark.generationAverage          avgt    5      550.906 ±     568.759  ns/op
+TestBenchmark.monoGenerationAverage      avgt    5       33.213 ±       1.528  ns/op
+TestBenchmark.uuidGenerationAverage      avgt    5      337.830 ±      91.290  ns/op
 ```

@@ -1,14 +1,23 @@
 package io.github.reonaore.ulidk
 
-import org.openjdk.jmh.annotations.*
-import java.util.*
-import java.util.concurrent.TimeUnit
+import kotlinx.benchmark.Benchmark
+import kotlinx.benchmark.BenchmarkMode
+import kotlinx.benchmark.BenchmarkTimeUnit
+import kotlinx.benchmark.Measurement
+import kotlinx.benchmark.Mode
+import kotlinx.benchmark.OutputTimeUnit
+import kotlinx.benchmark.Scope
+import kotlinx.benchmark.Setup
+import kotlinx.benchmark.State
+import org.openjdk.jmh.annotations.Warmup
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
+@Warmup(iterations = 5, time = 500, timeUnit = BenchmarkTimeUnit.MILLISECONDS)
+@Measurement(iterations = 5, time = 1, timeUnit = BenchmarkTimeUnit.SECONDS)
 @State(Scope.Benchmark)
-@Fork(2)
-@Warmup(iterations = 0)
-@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
-open class TestBenchmark {
+class TestBenchmark {
     var ulidString = ""
     var uuidString = ""
     var ulid: ULID = ULID.randomULID()
@@ -18,63 +27,63 @@ open class TestBenchmark {
     fun setup() {
         ulidString = ULID.randomULID().toString()
         ulid = ULID.randomULID()
-        uuidString = UUID.randomUUID().toString()
+        uuidString = Uuid.random().toString()
         monoULID = ULID.MonotonicGenerator(ulid)
     }
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    @OutputTimeUnit(TimeUnit.SECONDS)
+    @OutputTimeUnit(BenchmarkTimeUnit.SECONDS)
     fun generationThroughput(): String {
         return ULID.randomULID().toString()
     }
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
     fun generationAverage(): String {
         return ULID.randomULID().toString()
     }
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    @OutputTimeUnit(TimeUnit.SECONDS)
+    @OutputTimeUnit(BenchmarkTimeUnit.SECONDS)
     fun monoGenerationThroughput(): String {
         return monoULID().toString()
     }
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
     fun monoGenerationAverage(): String {
         return monoULID.toString()
     }
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    @OutputTimeUnit(TimeUnit.SECONDS)
+    @OutputTimeUnit(BenchmarkTimeUnit.SECONDS)
     fun decodeThroughput(): String {
         return ULID.fromString(ulidString).toString()
     }
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
     fun decodeAverage(): String {
         return ULID.fromString(ulidString).toString()
     }
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    @OutputTimeUnit(TimeUnit.SECONDS)
+    @OutputTimeUnit(BenchmarkTimeUnit.SECONDS)
     fun uuidGenerationThroughput(): String {
-        return UUID.randomUUID().toString()
+        return Uuid.random().toString()
     }
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
     fun uuidGenerationAverage(): String {
-        return UUID.randomUUID().toString()
+        return Uuid.random().toString()
     }
 }
