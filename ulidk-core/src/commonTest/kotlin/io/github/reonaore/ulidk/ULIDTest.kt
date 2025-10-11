@@ -3,42 +3,48 @@ package ulidk
 import io.github.reonaore.ulidk.Entropy
 import io.github.reonaore.ulidk.Timestamp
 import io.github.reonaore.ulidk.ULID
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.shouldBe
 import kotlinx.datetime.Clock
 import kotlinx.io.readByteArray
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFails
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 
 @OptIn(ExperimentalUuidApi::class)
-class ULIDTest : FunSpec({
+class ULIDTest {
 
-    test("generate") {
-        val ulid = ULID.Companion.randomULID().toString()
-        val got = ULID.Companion.fromString(ulid).toString()
-        ulid shouldBe got
+    @Test
+    fun generate() {
+        val ulid = ULID.randomULID().toString()
+        val got = ULID.fromString(ulid).toString()
+        assertEquals(ulid, got)
     }
 
-    test("sortable") {
-        val first = ULID.Companion.randomULID(timestamp = 0)
-        val second = ULID.Companion.randomULID(timestamp = 1)
+    @Test
+    fun sortable() {
+        val first = ULID.randomULID(timestamp = 0)
+        val second = ULID.randomULID(timestamp = 1)
         val testee = mutableListOf<ULID>()
 
         testee.add(second)
         testee.add(first)
         val got = testee.sorted()
-        got.first() shouldBe first
-        got[1] shouldBe second
+        assertEquals(first, got[0])
+        assertEquals(second, got[1])
     }
-    test("decode: success") {
+
+    @Test
+    fun decodeSuccess() {
         val testee = ULID.Companion.fromString("01H7PN3EH10123456789ABCDEF")
-        testee.timestamp() shouldBe 1691903703585L
-        testee.entropy() shouldBe listOf(
+        assertEquals(1691903703585L, testee.timestamp())
+        val wantEntropy = listOf(
             0x00,
             0x44,
             0x32,
@@ -50,85 +56,105 @@ class ULIDTest : FunSpec({
             0x35,
             0xcf,
         ).map { it.toByte() }
+        assertEquals(wantEntropy, testee.entropy().toList())
+
     }
 
-    test("decode: max value") {
+    @Test
+    fun decodeMaxValue() {
         val input = "7ZZZZZZZZZZZZZZZZZZZZZZZZZ"
         val got = ULID.fromString(input).toString()
 
-        got shouldBe input
+        assertEquals(input, got)
     }
-    test("decode: overflow value") {
+
+    @Test
+    fun decodeOverflowValue() {
         val input = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
         val got = ULID.Companion.fromString(input).toString()
 
-        got shouldBe "0ZZZZZZZZZZZZZZZZZZZZZZZZZ"
+        assertEquals("0ZZZZZZZZZZZZZZZZZZZZZZZZZ", got)
     }
-    test("decode: invalid string length") {
-        shouldThrow<IllegalArgumentException> {
-            ULID.Companion.fromString("1")
-        }
-    }
-    test("decode: string has invalid characters") {
-        shouldThrow<IllegalArgumentException> {
-            ULID.Companion.fromString("??????????????????????????")
+
+    @Test
+    fun decodeInvalidStringLength() {
+        assertFailsWith<IllegalArgumentException> {
+            ULID.fromString("1")
         }
     }
 
+    @Test
+    fun decodeStringHasInvalidCharacters() {
+        assertFailsWith<IllegalArgumentException> {
+            ULID.fromString("??????????????????????????")
+        }
+    }
 
-    test("binary order") {
+    @Test
+    fun binaryOrder() {
         val entropy = ByteArray(10) {
             (it + 7).toByte()
-        }.let { Entropy.Companion.fromBinary(it) }
+        }.let { Entropy.fromBinary(it) }
         val timestamp = Timestamp(0x010203040506)
         val testee = ULID(timestamp, entropy)
-        testee.binary.readByteArray() shouldBe (1..16).map { it.toByte() }.toByteArray()
-    }
-    test("monotonic: normal") {
-        val input = ULID.Companion.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY")
-        val ulidGen = ULID.MonotonicGenerator(input)
-        ulidGen().toString() shouldBe "01BX5ZZKBKACTAV9WEVGEMMVRZ"
-        ulidGen().toString() shouldBe "01BX5ZZKBKACTAV9WEVGEMMVS0"
-    }
-    test("monotinoc edge case") {
-        val ulidGen = ULID.MonotonicGenerator(ULID.Companion.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY"))
-        ulidGen().toString() shouldBe "01BX5ZZKBKZZZZZZZZZZZZZZZZ"
-        runCatching {
-            ulidGen().toString()
-        }.isFailure.shouldBeTrue()
+        val want = (1..16).map { it.toByte() }
+        assertEquals(want, testee.binary.readByteArray().toList())
     }
 
-    test("uuid") {
+    @Test
+    fun monotonicNormal() {
+        val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY")
+        val ulidGen = ULID.MonotonicGenerator(input)
+        assertEquals("01BX5ZZKBKACTAV9WEVGEMMVRZ", ulidGen().toString())
+        assertEquals("01BX5ZZKBKACTAV9WEVGEMMVS0", ulidGen().toString())
+    }
+
+    @Test
+    fun monotonicEdgeCase() {
+        val ulidGen = ULID.MonotonicGenerator(ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY"))
+        assertEquals("01BX5ZZKBKZZZZZZZZZZZZZZZZ", ulidGen().toString())
+        assertFails {
+            ulidGen().toString()
+        }
+    }
+
+    @Test
+    fun uuid() {
         val testUUID = Uuid.parse("0189F43F-638C-E637-8CAE-422318BD567E")
         val testULID = ULID.fromString("01H7T3YRWCWRVRSBJ24CCBTNKY")
-        testULID.toUUID() shouldBe testUUID
-        ULID.fromUUID(testUUID) shouldBe testULID
-    }
-    test("timestamp") {
-        val timestamp = Clock.System.now()
-        val testULID = ULID.randomULID(timestamp = timestamp.toEpochMilliseconds())
-        testULID.instant().toEpochMilliseconds() shouldBe timestamp.toEpochMilliseconds()
+        assertEquals(testUUID, testULID.toUUID())
+        assertEquals(testULID, ULID.fromUUID(testUUID))
     }
 
-    test("serializer") {
+    @Test
+    fun timestamp() {
+        val timestamp = Clock.System.now()
+        val testULID = ULID.randomULID(timestamp = timestamp.toEpochMilliseconds())
+        assertEquals(timestamp.toEpochMilliseconds(), testULID.instant().toEpochMilliseconds())
+    }
+
+    @Test
+    fun serializer() {
         @Serializable
         data class TestObject(val v: ULID)
 
         val ulid = ULID.randomULID()
         val testee = TestObject(ulid)
         val json = """{"v":"$ulid"}"""
-        Json.encodeToString(testee) shouldBe json
-        Json.decodeFromString<TestObject>(json) shouldBe testee
+        assertEquals(json, Json.encodeToString(testee))
+        assertEquals(testee, Json.decodeFromString<TestObject>(json))
 
-        ULID.serializer().descriptor.serialName shouldBe "io.github.reonaore.ulidk.ULID"
+        assertEquals("io.github.reonaore.ulidk.ULID", ULID.serializer().descriptor.serialName)
     }
-    test("equality") {
+
+    @Test
+    fun equality() {
         val ulid = ULID.randomULID()
-        (ulid == ulid) shouldBe true
-        (ulid == ULID.randomULID()) shouldBe false
-        (ulid == ULID.fromString(ulid.toString())).shouldBeTrue()
+        assertTrue { ulid == ulid }
+        assertFalse { ulid == ULID.randomULID() }
+        assertTrue { ulid == ULID.fromString(ulid.toString()) }
         // hash
-        (ulid.hashCode() == ULID.fromString(ulid.toString()).hashCode()).shouldBeTrue()
-        (ulid.hashCode() == ULID.hashCode()) shouldBe false
+        assertTrue { ulid.hashCode() == ULID.fromString(ulid.toString()).hashCode() }
+        assertFalse { ulid.hashCode() == ULID.hashCode() }
     }
-})
+}

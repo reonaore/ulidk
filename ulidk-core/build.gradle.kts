@@ -1,14 +1,15 @@
 import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.allopen)
     alias(libs.plugins.dokka)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
-    alias(libs.plugins.kotest.multiplatform)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.publish)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     signing
 }
 
@@ -16,6 +17,7 @@ group = "io.github.reonaore"
 version = "0.2.0"
 
 repositories {
+    google()
     mavenCentral()
 }
 
@@ -25,8 +27,43 @@ kotlin {
             useJUnitPlatform()
         }
     }
-    js(IR) {
+    js {
         browser()
+        nodejs()
+        binaries.library()
+    }
+    iosArm64()
+    macosArm64()
+    linuxX64()
+
+    androidLibrary {
+        namespace = "io.github.reonaore.ulidk"
+        compileSdk = 33
+        minSdk = 24
+        withJava() // enable java compilation support
+        withHostTestBuilder {}.configure {}
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }
+
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(
+                        org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+                    )
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        nodejs()
+    }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmWasi {
         nodejs()
     }
 
@@ -45,15 +82,7 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation(libs.kotest.property)
-                implementation(libs.kotest.assertions.core)
-                implementation(libs.kotest.framework.engine)
-            }
-        }
-        jvmTest {
-            dependencies {
-                implementation(libs.kotest.runner.junit5)
-                implementation(libs.kotest.runner.junit5.jvm)
+                implementation(kotlin("test"))
             }
         }
     }
