@@ -100,6 +100,10 @@ mavenPublishing {
                 name.set("MIT License")
                 url.set("http://www.opensource.org/licenses/mit-license.php")
             }
+            license {
+                name.set("Apache License 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0")
+            }
         }
         developers {
             developer {
