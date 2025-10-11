@@ -2,8 +2,6 @@ package io.github.reonaore.ulidk
 
 import io.github.reonaore.ulidk.internal.SecureRandomGenerator
 import io.github.reonaore.ulidk.internal.getSecureRandomGenerator
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.io.Buffer
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
@@ -14,6 +12,8 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -23,6 +23,7 @@ import kotlin.uuid.Uuid
  * @property entropy the randomness of the ULID
  * @property binary the binary of the ULID. It has 128 bits.
  */
+@OptIn(ExperimentalTime::class)
 @Serializable(with = ULID.Serializer::class)
 class ULID internal constructor(
     private val timestamp: Timestamp,
@@ -48,7 +49,7 @@ class ULID internal constructor(
          * @param random an instance of SecureRandom that is used to generate an entropy.
          */
         fun randomULID(
-            timestamp: Long = Clock.System.now().toEpochMilliseconds(),
+            timestamp: Long = kotlin.time.Clock.System.now().toEpochMilliseconds(),
             random: SecureRandomGenerator = Companion.random
         ): ULID {
             val entropy = random.nextBytes(Entropy.BYTE_SIZE)

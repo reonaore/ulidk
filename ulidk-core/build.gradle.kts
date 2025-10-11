@@ -1,4 +1,3 @@
-import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -90,7 +89,7 @@ kotlin {
 
 mavenPublishing {
     coordinates(project.group.toString(), project.name, project.version.toString())
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
     signAllPublications()
     pom {
         name.set("${project.group}:${project.name}")

@@ -3,7 +3,6 @@ package ulidk
 import io.github.reonaore.ulidk.Entropy
 import io.github.reonaore.ulidk.Timestamp
 import io.github.reonaore.ulidk.ULID
-import kotlinx.datetime.Clock
 import kotlinx.io.readByteArray
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -13,11 +12,13 @@ import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 
-@OptIn(ExperimentalUuidApi::class)
+@OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 class ULIDTest {
 
     @Test
@@ -42,7 +43,7 @@ class ULIDTest {
 
     @Test
     fun decodeSuccess() {
-        val testee = ULID.Companion.fromString("01H7PN3EH10123456789ABCDEF")
+        val testee = ULID.fromString("01H7PN3EH10123456789ABCDEF")
         assertEquals(1691903703585L, testee.timestamp())
         val wantEntropy = listOf(
             0x00,
@@ -71,7 +72,7 @@ class ULIDTest {
     @Test
     fun decodeOverflowValue() {
         val input = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-        val got = ULID.Companion.fromString(input).toString()
+        val got = ULID.fromString(input).toString()
 
         assertEquals("0ZZZZZZZZZZZZZZZZZZZZZZZZZ", got)
     }
