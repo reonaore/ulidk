@@ -12,6 +12,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
@@ -34,11 +35,6 @@ class ULID internal constructor(
         private const val BINARY_SIZE = 16
         private const val TIMESTAMP_BINARY_SIZE = 6
         private const val STRING_LENGTH = 26
-        private const val BASE32_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
-        internal val toBase32 = BASE32_ALPHABET.toList().map { it.code.toByte() }
-        private val base32LookUp = BASE32_ALPHABET.withIndex().associateBy({ it.value }, { it.index.toLong() })
-        internal const val BIT_NUM = 5
-        private const val BIT_MASK = 0x1fL
 
         private val random = getSecureRandomGenerator()
 
@@ -49,7 +45,7 @@ class ULID internal constructor(
          * @param random an instance of SecureRandom that is used to generate an entropy.
          */
         fun randomULID(
-            timestamp: Long = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+            timestamp: Long = Clock.System.now().toEpochMilliseconds(),
             random: SecureRandomGenerator = Companion.random
         ): ULID {
             val entropy = random.nextBytes(Entropy.BYTE_SIZE)
@@ -66,10 +62,7 @@ class ULID internal constructor(
         fun fromString(str: String): ULID {
             require(str.length == STRING_LENGTH) { "String length must be $STRING_LENGTH" }
 
-            val byteList = str.toList().map {
-                base32LookUp[it]?.and(BIT_MASK)
-                    ?: throw IllegalArgumentException("Input string has some invalid chars")
-            }
+            val byteList = Base32Decoder.decodeBase32(str)
             return ULID(
                 timestamp = Timestamp.fromDecodedBytes(byteList.subList(0, 10)),
                 entropy = Entropy.fromDecodedBytes(byteList.subList(10, 26)),
@@ -88,11 +81,12 @@ class ULID internal constructor(
          */
         @OptIn(ExperimentalUuidApi::class)
         fun fromUUID(uuid: Uuid): ULID {
-            val buf = Buffer()
-            return uuid.toLongs { mostSignificantBits, leastSignificantBits ->
-                buf.writeLong(mostSignificantBits)
-                buf.writeLong(leastSignificantBits)
-                fromBinary(buf.readByteArray())
+            return with(Buffer()) {
+                uuid.toLongs { mostSignificantBits, leastSignificantBits ->
+                    writeLong(mostSignificantBits)
+                    writeLong(leastSignificantBits)
+                    fromBinary(readByteArray())
+                }
             }
         }
     }
@@ -151,24 +145,21 @@ class ULID internal constructor(
      */
     fun entropy(): ByteArray = entropy.binary
 
-    val binary
-        get(): Source {
-            val buf = Buffer()
-            timestamp.write(buf)
-            entropy.write(buf)
-            return buf
-        }
-
-
-    private fun generateString(): String {
-        return with(Buffer()) {
-            timestamp.writeBase32(this)
-            entropy.writeBase32(this)
-            this.readString()
+    val binary: Source by lazy {
+        with(Buffer()) {
+            timestamp.write(this)
+            entropy.write(this)
+            this
         }
     }
 
-    private val str: String by lazy { generateString() }
+    private val str: String by lazy {
+        with(Buffer()) {
+            timestamp.writeBase32(this)
+            entropy.writeBase32(this)
+            readString()
+        }
+    }
 
     /**
      * @return Base32 encoded string
@@ -190,8 +181,7 @@ class ULID internal constructor(
 
     @OptIn(ExperimentalUuidApi::class)
     fun toUUID(): Uuid {
-        val buf = binary
-        return Uuid.fromLongs(buf.readLong(), buf.readLong())
+        return Uuid.fromLongs(binary.readLong(), binary.readLong())
     }
 
 }

@@ -25,8 +25,8 @@ internal data class Entropy(
          */
         @Suppress("MagicNumber")
         fun fromDecodedBytes(byteList: List<Long>): Entropy {
-            val msb = EntropyValue.fromDecodedBytes(byteList.subList(0, 8))
-            val lsb = EntropyValue.fromDecodedBytes(byteList.subList(8, 16))
+            val msb = EntropyValue(byteList.subList(0, 8))
+            val lsb = EntropyValue(byteList.subList(8, 16))
             return Entropy(msb, lsb)
         }
 
@@ -80,7 +80,7 @@ internal data class Entropy(
     /**
      * @return true if the value has 80bits all high
      */
-    fun isFull(): Boolean = msb.isFull() && lsb.isFull()
+    fun isFull() = msb.isFull() && lsb.isFull()
 }
 
 /**
@@ -91,66 +91,38 @@ internal class EntropyValue(value: Long) {
 
     val value = value and BIT_MASK
 
-    companion object {
-        private const val CHUNK_BITS = 40 // CHUNK_BYTES * BYTE_BITS
+    companion object : Base32Encoder, BinaryReadWriter {
+        override val bitSize = 40
+        override val base32StringLength = 8
         private const val BIT_MASK = 0xffffffffff
         const val BYTE_SIZE = 5
-        private const val BYTE_BITS = 8
-        private const val BYTE_MASK = 0xffL
-        private const val BASE32_MASK = 0x1fL
 
         @Throws(IllegalArgumentException::class)
         private fun parseBinary(binary: ByteArray): Long {
             require(binary.size == BYTE_SIZE) {
                 "Binary length must be $BYTE_SIZE"
             }
-            var v = 0L
-            for (bin in binary) {
-                v = v shl BYTE_BITS or (bin.toLong() and BYTE_MASK)
-            }
-            return v and BIT_MASK
-        }
-
-        /**
-         * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
-         * @param byteList
-         */
-        @Suppress("MagicNumber")
-        fun fromDecodedBytes(byteList: List<Long>): EntropyValue {
-            var chunk = 0L
-            // 35 = (chunk string length (8) - 1) * 5 bit
-            (35 downTo 0 step ULID.BIT_NUM).forEachIndexed { index, shiftBits ->
-                chunk = chunk or (byteList[index] shl shiftBits)
-            }
-            return EntropyValue(chunk)
+            return readBinary(binary)
         }
     }
 
-    operator fun inc(): EntropyValue = EntropyValue(value + 1)
+    operator fun inc() = EntropyValue(value + 1)
 
+    constructor(byteList: List<Long>) : this(decodeBytes(byteList))
     constructor(binary: ByteArray) : this(parseBinary(binary))
 
     /**
      * Write the value as binary
      */
-    @Suppress("MagicNumber")
-    fun write(buf: Sink) {
-        for (shiftBits in 32 downTo 0 step BYTE_BITS) {
-            buf.writeByte(((value ushr shiftBits) and 0xff).toByte())
-        }
-    }
+    fun write(buf: Sink) = buf.writeBinary(value)
 
     /**
      * Write the value with Base32 encoded to buffer
      */
-    fun writeBase32(buf: Sink) {
-        for (shiftBits in CHUNK_BITS - ULID.BIT_NUM downTo 0 step ULID.BIT_NUM) {
-            buf.writeByte(ULID.toBase32[(value ushr shiftBits and BASE32_MASK).toInt()])
-        }
-    }
+    fun writeBase32(buf: Sink) = buf.writeBase32(value)
 
     /**
      * @return true if the value is 40bits all high
      */
-    fun isFull(): Boolean = value == BIT_MASK
+    fun isFull() = value == BIT_MASK
 }
