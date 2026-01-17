@@ -40,7 +40,7 @@ kotlin {
         compileSdk = 33
         minSdk = 24
         withJava() // enable java compilation support
-        withHostTestBuilder {}.configure {}
+        // withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
             sourceSetTreeName = "test"
         }
