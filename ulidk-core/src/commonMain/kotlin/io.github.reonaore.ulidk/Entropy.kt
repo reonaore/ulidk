@@ -1,5 +1,6 @@
 package io.github.reonaore.ulidk
 
+import io.github.reonaore.ulidk.internal.decodeBase32Bytes
 import io.github.reonaore.ulidk.internal.BinaryReadWriter
 import io.github.reonaore.ulidk.internal.ULIDComponent
 import io.github.reonaore.ulidk.internal.ULIDConstants
@@ -99,14 +100,8 @@ internal class EntropyValue(value: Long) : ULIDComponent(value, ULIDConstants.BI
         const val BYTE_SIZE = ULIDConstants.ENTROPY_VALUE_BYTE_SIZE
 
         @Throws(IllegalArgumentException::class)
-        private fun decodeBytes(bytes: List<Long>): Long {
-            var res = 0L
-            val bits = (base32StringLength - 1) * 5
-            (bits downTo 0 step 5).forEachIndexed { index, shiftBits ->
-                res = res or ((bytes[index] and 0x1fL) shl shiftBits)
-            }
-            return res
-        }
+        private fun decodeBytes(bytes: List<Long>): Long =
+            decodeBase32Bytes(bytes, base32StringLength)
         private fun parseBinary(binary: ByteArray): Long {
             require(binary.size == BYTE_SIZE) {
                 "Binary length must be $BYTE_SIZE"

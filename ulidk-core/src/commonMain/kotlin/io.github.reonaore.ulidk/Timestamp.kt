@@ -1,5 +1,6 @@
 package io.github.reonaore.ulidk
 
+import io.github.reonaore.ulidk.internal.decodeBase32Bytes
 import io.github.reonaore.ulidk.internal.ULIDComponent
 import io.github.reonaore.ulidk.internal.ULIDConstants
 import kotlinx.io.Sink
@@ -16,14 +17,8 @@ internal class Timestamp(value: Long) : ULIDComponent(value, ULIDConstants.BIT_M
         private const val BASE32_STRING_LENGTH = 10
         private val BIT_SIZE = ULIDConstants.TIMESTAMP_BIT_SIZE
 
-        private fun decodeBytes(bytes: List<Long>): Long {
-            var res = 0L
-            val bits = (BASE32_STRING_LENGTH - 1) * 5
-            (bits downTo 0 step 5).forEachIndexed { index, shiftBits ->
-                res = res or ((bytes[index] and 0x1fL) shl shiftBits)
-            }
-            return res
-        }
+        private fun decodeBytes(bytes: List<Long>): Long =
+            decodeBase32Bytes(bytes, BASE32_STRING_LENGTH)
 
         private fun readBinary(bin: ByteArray): Long {
             var res = 0L
