@@ -30,11 +30,11 @@ class ULID internal constructor(
     private val timestamp: Timestamp,
     private val entropy: Entropy,
 ) : Comparable<ULID> {
+    internal val timestampInternal: Timestamp get() = timestamp
+    internal val entropyInternal: Entropy get() = entropy
 
     companion object {
-        private const val BINARY_SIZE = 16
         private const val TIMESTAMP_BINARY_SIZE = 6
-        private const val STRING_LENGTH = 26
 
         private val random = getSecureRandomGenerator()
 
@@ -60,9 +60,13 @@ class ULID internal constructor(
          */
         @Suppress("MagicNumber")
         fun fromString(str: String): ULID {
-            require(str.length == STRING_LENGTH) { "String length must be $STRING_LENGTH" }
+            require(str.length == ULIDConstants.STRING_LENGTH) { "ULID string must be ${ULIDConstants.STRING_LENGTH} characters long, got ${str.length}" }
 
-            val byteList = Base32Decoder.decodeBase32(str)
+            val byteList = try {
+                Base32Decoder.decodeBase32(str)
+            } catch (e: IllegalArgumentException) {
+                throw ULIDParseException("Invalid Base32 characters in ULID string: $str", e)
+            }
             return ULID(
                 timestamp = Timestamp.fromDecodedBytes(byteList.subList(0, 10)),
                 entropy = Entropy.fromDecodedBytes(byteList.subList(10, 26)),
@@ -70,9 +74,9 @@ class ULID internal constructor(
         }
 
         private fun fromBinary(bin: ByteArray): ULID {
-            require(bin.size == BINARY_SIZE) { "Binary size must be $BINARY_SIZE" }
+            require(bin.size == ULIDConstants.BINARY_SIZE) { "Binary size must be ${ULIDConstants.BINARY_SIZE}" }
             val timestamp = Timestamp.fromBinary(bin.sliceArray(0 until TIMESTAMP_BINARY_SIZE))
-            val entropy = Entropy.fromBinary(bin.sliceArray(TIMESTAMP_BINARY_SIZE until BINARY_SIZE))
+            val entropy = Entropy.fromBinary(bin.sliceArray(TIMESTAMP_BINARY_SIZE until ULIDConstants.BINARY_SIZE))
             return ULID(timestamp, entropy)
         }
 
@@ -81,37 +85,14 @@ class ULID internal constructor(
          */
         @OptIn(ExperimentalUuidApi::class)
         fun fromUUID(uuid: Uuid): ULID {
-            return with(Buffer()) {
-                uuid.toLongs { mostSignificantBits, leastSignificantBits ->
-                    writeLong(mostSignificantBits)
-                    writeLong(leastSignificantBits)
-                    fromBinary(readByteArray())
+            val bin = ByteArray(16)
+            uuid.toLongs { mostSig, leastSig ->
+                for (i in 0..7) {
+                    bin[i] = (mostSig shr (56 - i * 8)).toByte()
+                    bin[i + 8] = (leastSig shr (56 - i * 8)).toByte()
                 }
             }
-        }
-    }
-
-    /**
-     * MonotonicGenerator generates new monotonic ULIDs.
-     * @constructor creates its instance from an ULID.
-     * @property timestamp timestamp of the base ULID.
-     * @property entropy entropy of the base ULID. This is updated when a new ULID is generated.
-     */
-    class MonotonicGenerator(ulid: ULID = randomULID()) {
-        private var timestamp = ulid.timestamp.value
-        private var entropy = ulid.entropy
-
-        /**
-         * Generate a new monotonic ULID.
-         * @param timestamp timestamp of newly generated ULID.
-         * @return monotonic ULID
-         * @throws IllegalArgumentException when entropy is overflowed
-         */
-        operator fun invoke(timestamp: Long = this.timestamp): ULID {
-            require(!entropy.isFull()) {
-                throw IllegalStateException("Entropy will be overflowed")
-            }
-            return ULID(timestamp = Timestamp(timestamp), entropy = ++entropy)
+            return fromBinary(bin)
         }
     }
 

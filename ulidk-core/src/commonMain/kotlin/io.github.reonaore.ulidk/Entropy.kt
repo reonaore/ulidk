@@ -17,7 +17,7 @@ internal data class Entropy(
 
     companion object {
 
-        internal const val BYTE_SIZE = 10
+        internal const val BYTE_SIZE = ULIDConstants.ENTROPY_BYTE_SIZE
 
         /**
          * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
@@ -87,15 +87,13 @@ internal data class Entropy(
  * This class stands for variable which has 40 bits
  * @property value this value has 40 bits
  */
-internal class EntropyValue(value: Long) {
-
-    val value = value and BIT_MASK
+internal class EntropyValue(value: Long) : ULIDComponent(value, ULIDConstants.BIT_MASK_40) {
+    override val base32StringLength = 8
 
     companion object : Base32Encoder, BinaryReadWriter {
-        override val bitSize = 40
+        override val bitSize = ULIDConstants.ENTROPY_VALUE_BIT_SIZE
         override val base32StringLength = 8
-        private const val BIT_MASK = 0xffffffffff
-        const val BYTE_SIZE = 5
+        const val BYTE_SIZE = ULIDConstants.ENTROPY_VALUE_BYTE_SIZE
 
         @Throws(IllegalArgumentException::class)
         private fun parseBinary(binary: ByteArray): Long {
@@ -108,21 +106,11 @@ internal class EntropyValue(value: Long) {
 
     operator fun inc() = EntropyValue(value + 1)
 
-    constructor(byteList: List<Long>) : this(decodeBytes(byteList))
+    constructor(byteList: List<Long>) : this(Companion.decodeBytes(byteList))
     constructor(binary: ByteArray) : this(parseBinary(binary))
-
-    /**
-     * Write the value as binary
-     */
-    fun write(buf: Sink) = buf.writeBinary(value)
-
-    /**
-     * Write the value with Base32 encoded to buffer
-     */
-    fun writeBase32(buf: Sink) = buf.writeBase32(value)
 
     /**
      * @return true if the value is 40bits all high
      */
-    fun isFull() = value == BIT_MASK
+    fun isFull() = value == ULIDConstants.BIT_MASK_40
 }

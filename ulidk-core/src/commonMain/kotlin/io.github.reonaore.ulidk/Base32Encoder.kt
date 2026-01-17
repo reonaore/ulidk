@@ -34,7 +34,7 @@ internal object Base32Decoder {
     fun decodeBase32(str: String): List<Long> {
         return str.toList().map {
             base32LookUp[it]?.and(BIT_MASK)
-                ?: throw IllegalArgumentException("Input string has some invalid chars")
+                ?: throw ULIDParseException("Invalid character '${it}' in Base32 string")
         }
     }
 }

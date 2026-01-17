@@ -3,6 +3,7 @@ package ulidk
 import io.github.reonaore.ulidk.Entropy
 import io.github.reonaore.ulidk.Timestamp
 import io.github.reonaore.ulidk.ULID
+import io.github.reonaore.ulidk.MonotonicGenerator
 import kotlinx.io.readByteArray
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -105,14 +106,14 @@ class ULIDTest {
     @Test
     fun monotonicNormal() {
         val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY")
-        val ulidGen = ULID.MonotonicGenerator(input)
+        val ulidGen = MonotonicGenerator(input)
         assertEquals("01BX5ZZKBKACTAV9WEVGEMMVRZ", ulidGen().toString())
         assertEquals("01BX5ZZKBKACTAV9WEVGEMMVS0", ulidGen().toString())
     }
 
     @Test
     fun monotonicEdgeCase() {
-        val ulidGen = ULID.MonotonicGenerator(ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY"))
+        val ulidGen = MonotonicGenerator(ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY"))
         assertEquals("01BX5ZZKBKZZZZZZZZZZZZZZZZ", ulidGen().toString())
         assertFails {
             ulidGen().toString()
