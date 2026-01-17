@@ -21,14 +21,14 @@ class TestBenchmark {
     var ulidString = ""
     var uuidString = ""
     var ulid: ULID = ULID.randomULID()
-    var monoULID = MonotonicGenerator(ulid)
+    var monoULID = ULIDMonotonicGenerator(ulid)
 
     @Setup
     fun setup() {
         ulidString = ULID.randomULID().toString()
         ulid = ULID.randomULID()
         uuidString = Uuid.random().toString()
-        monoULID = MonotonicGenerator(ulid)
+        monoULID = ULIDMonotonicGenerator(ulid)
     }
 
     @Benchmark

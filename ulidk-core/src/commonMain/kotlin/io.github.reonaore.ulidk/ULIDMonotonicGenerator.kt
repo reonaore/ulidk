@@ -1,12 +1,12 @@
 package io.github.reonaore.ulidk
 
 /**
- * MonotonicGenerator generates new monotonic ULIDs.
+ * ULIDMonotonicGenerator generates new monotonic ULIDs.
  * @constructor creates its instance from an ULID.
  * @property timestamp timestamp of the base ULID.
  * @property entropy entropy of the base ULID. This is updated when a new ULID is generated.
  */
-class MonotonicGenerator(ulid: ULID = ULID.randomULID()) {
+class ULIDMonotonicGenerator(ulid: ULID = ULID.randomULID()) {
     private var timestamp = ulid.timestampInternal.value
     private var entropy = ulid.entropyInternal
 
