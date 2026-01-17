@@ -2,7 +2,6 @@ package io.github.reonaore.ulidk
 
 import io.github.reonaore.ulidk.internal.Consts
 import io.github.reonaore.ulidk.internal.ULIDComponent
-import io.github.reonaore.ulidk.internal.decodeBase32Bytes
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.readByteArray
@@ -100,8 +99,8 @@ internal class EntropyValue(value: Long) : ULIDComponent(value, Consts.BIT_MASK_
 
     operator fun inc() = EntropyValue(value + 1)
 
-    constructor(byteList: List<Long>) : this(decodeBase32Bytes(byteList, BASE32_STRING_LENGTH))
-    constructor(binary: ByteArray) : this(parseBinary(binary, Consts.ENTROPY_VALUE_BIT_SIZE))
+    constructor(byteList: List<Long>) : this(ULIDComponent.fromDecodedBytes(byteList, BASE32_STRING_LENGTH))
+    constructor(binary: ByteArray) : this(ULIDComponent.parseBinary(binary, Consts.ENTROPY_VALUE_BIT_SIZE))
 
     /**
      * @return true if the value is 40bits all high

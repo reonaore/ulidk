@@ -31,5 +31,7 @@ internal abstract class ULIDComponent(
             }
             return res
         }
+
+        internal fun fromDecodedBytes(bytes: List<Long>, base32StringLength: Int): Long = decodeBase32Bytes(bytes, base32StringLength)
     }
 }
