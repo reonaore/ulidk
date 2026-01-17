@@ -1,6 +1,6 @@
 package io.github.reonaore.ulidk.internal
 
-internal object ULIDConstants {
+internal object Consts {
     const val TIMESTAMP_BIT_SIZE = 48
     const val ENTROPY_BIT_SIZE = 80
     const val ENTROPY_VALUE_BIT_SIZE = 40

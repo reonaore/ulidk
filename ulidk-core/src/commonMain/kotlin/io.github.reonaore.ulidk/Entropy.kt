@@ -3,7 +3,7 @@ package io.github.reonaore.ulidk
 import io.github.reonaore.ulidk.internal.decodeBase32Bytes
 import io.github.reonaore.ulidk.internal.BinaryReadWriter
 import io.github.reonaore.ulidk.internal.ULIDComponent
-import io.github.reonaore.ulidk.internal.ULIDConstants
+import io.github.reonaore.ulidk.internal.Consts
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.readByteArray
@@ -21,7 +21,7 @@ internal data class Entropy(
 
     companion object {
 
-        internal const val BYTE_SIZE = ULIDConstants.ENTROPY_BYTE_SIZE
+        internal const val BYTE_SIZE = Consts.ENTROPY_BYTE_SIZE
 
         /**
          * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
@@ -91,13 +91,13 @@ internal data class Entropy(
  * This class stands for variable which has 40 bits
  * @property value this value has 40 bits
  */
-internal class EntropyValue(value: Long) : ULIDComponent(value, ULIDConstants.BIT_MASK_40) {
+internal class EntropyValue(value: Long) : ULIDComponent(value, Consts.BIT_MASK_40) {
     override val base32StringLength = 8
 
     companion object {
-            val bitSize = ULIDConstants.ENTROPY_VALUE_BIT_SIZE
+            val bitSize = Consts.ENTROPY_VALUE_BIT_SIZE
             val base32StringLength = 8
-        const val BYTE_SIZE = ULIDConstants.ENTROPY_VALUE_BYTE_SIZE
+        const val BYTE_SIZE = Consts.ENTROPY_VALUE_BYTE_SIZE
 
         @Throws(IllegalArgumentException::class)
         private fun decodeBytes(bytes: List<Long>): Long =
@@ -123,5 +123,5 @@ internal class EntropyValue(value: Long) : ULIDComponent(value, ULIDConstants.BI
     /**
      * @return true if the value is 40bits all high
      */
-    fun isFull() = value == ULIDConstants.BIT_MASK_40
+    fun isFull() = value == Consts.BIT_MASK_40
 }
