@@ -1,6 +1,5 @@
 package io.github.reonaore.ulidk
 
-import io.github.reonaore.ulidk.internal.Consts
 import io.github.reonaore.ulidk.internal.ULIDComponent
 import io.github.reonaore.ulidk.internal.ULIDComponentFactory
 import kotlinx.io.Buffer
@@ -19,6 +18,8 @@ internal data class Entropy(
 ) {
 
     companion object {
+        internal const val BYTE_SIZE = 10
+        private const val VALUE_BYTE_SIZE = 5
 
         /**
          * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
@@ -36,12 +37,12 @@ internal data class Entropy(
          * @param binary the length must be 80 bits
          */
         fun fromBinary(binary: ByteArray): Entropy {
-            require(binary.size == Consts.ENTROPY_BYTE_SIZE) {
-                "Binary length must be ${Consts.ENTROPY_VALUE_BYTE_SIZE}"
+            require(binary.size == BYTE_SIZE) {
+                "Binary length must be $BYTE_SIZE"
             }
             return Entropy(
-                msb = EntropyValue(binary.copyOfRange(0, Consts.ENTROPY_VALUE_BYTE_SIZE)),
-                lsb = EntropyValue(binary.copyOfRange(Consts.ENTROPY_VALUE_BYTE_SIZE, Consts.ENTROPY_BYTE_SIZE))
+                msb = EntropyValue(binary.copyOfRange(0, VALUE_BYTE_SIZE)),
+                lsb = EntropyValue(binary.copyOfRange(VALUE_BYTE_SIZE, BYTE_SIZE))
             )
         }
     }
@@ -94,8 +95,11 @@ internal class EntropyValue : ULIDComponent {
     constructor(binary: ByteArray) : super(Companion, binary)
 
     companion object : ULIDComponentFactory {
-        override val bitMask = Consts.BIT_MASK_40
-        override val bitSize = Consts.ENTROPY_VALUE_BIT_SIZE
+        private const val BIT_MASK_40 = 0xffffffffffL
+        private const val ENTROPY_VALUE_BIT_SIZE = 40
+
+        override val bitMask = BIT_MASK_40
+        override val bitSize = ENTROPY_VALUE_BIT_SIZE
         override val base32StringLength = 8
     }
 
@@ -104,5 +108,5 @@ internal class EntropyValue : ULIDComponent {
     /**
      * @return true if the value is 40bits all high
      */
-    fun isFull() = value == Consts.BIT_MASK_40
+    fun isFull() = value == BIT_MASK_40
 }

@@ -7,8 +7,8 @@ package io.github.reonaore.ulidk
  * @property entropy entropy of the base ULID. This is updated when a new ULID is generated.
  */
 class ULIDMonotonicGenerator(ulid: ULID = ULID.randomULID()) {
-    private var timestamp = ulid.timestampInternal.value
-    private var entropy = ulid.entropyInternal
+    private var timestamp = ulid.timestamp.value
+    private var entropy = ulid.entropy
 
     /**
      * Generate a new monotonic ULID.

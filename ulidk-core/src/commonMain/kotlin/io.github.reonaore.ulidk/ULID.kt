@@ -1,12 +1,10 @@
 package io.github.reonaore.ulidk
 
 import io.github.reonaore.ulidk.internal.Base32Decoder
-import io.github.reonaore.ulidk.internal.Consts
 import io.github.reonaore.ulidk.internal.SecureRandomGenerator
 import io.github.reonaore.ulidk.internal.getSecureRandomGenerator
 import kotlinx.io.Buffer
 import kotlinx.io.Source
-import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -29,14 +27,13 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalTime::class)
 @Serializable(with = ULID.Serializer::class)
 class ULID internal constructor(
-    private val timestamp: Timestamp,
-    private val entropy: Entropy,
+    internal val timestamp: Timestamp,
+    internal val entropy: Entropy,
 ) : Comparable<ULID> {
-    internal val timestampInternal: Timestamp get() = timestamp
-    internal val entropyInternal: Entropy get() = entropy
-
     companion object {
         private const val TIMESTAMP_BINARY_SIZE = 6
+        private const val STRING_LENGTH = 26
+        private const val BINARY_SIZE = 16
 
         private val random = getSecureRandomGenerator()
 
@@ -62,7 +59,9 @@ class ULID internal constructor(
          */
         @Suppress("MagicNumber")
         fun fromString(str: String): ULID {
-            require(str.length == Consts.STRING_LENGTH) { "ULID string must be ${Consts.STRING_LENGTH} characters long, got ${str.length}" }
+            require(str.length == STRING_LENGTH) {
+                "ULID string must be $STRING_LENGTH characters long, got ${str.length}"
+            }
 
             val byteList = try {
                 Base32Decoder.decodeBase32(str)
@@ -76,9 +75,9 @@ class ULID internal constructor(
         }
 
         private fun fromBinary(bin: ByteArray): ULID {
-            require(bin.size == Consts.BINARY_SIZE) { "Binary size must be ${Consts.BINARY_SIZE}" }
+            require(bin.size == BINARY_SIZE) { "Binary size must be $BINARY_SIZE" }
             val timestamp = Timestamp.fromBinary(bin.sliceArray(0 until TIMESTAMP_BINARY_SIZE))
-            val entropy = Entropy.fromBinary(bin.sliceArray(TIMESTAMP_BINARY_SIZE until Consts.BINARY_SIZE))
+            val entropy = Entropy.fromBinary(bin.sliceArray(TIMESTAMP_BINARY_SIZE until BINARY_SIZE))
             return ULID(timestamp, entropy)
         }
 
@@ -86,6 +85,7 @@ class ULID internal constructor(
          * Generates ULID from UUID
          */
         @OptIn(ExperimentalUuidApi::class)
+        @Suppress("MagicNumber")
         fun fromUUID(uuid: Uuid): ULID {
             val bin = ByteArray(16)
             uuid.toLongs { mostSig, leastSig ->

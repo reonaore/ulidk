@@ -1,6 +1,5 @@
 package io.github.reonaore.ulidk
 
-import io.github.reonaore.ulidk.internal.Consts
 import io.github.reonaore.ulidk.internal.ULIDComponent
 import io.github.reonaore.ulidk.internal.ULIDComponentFactory
 
@@ -14,8 +13,8 @@ internal class Timestamp : ULIDComponent {
     constructor(binary: ByteArray) : super(Companion, binary)
 
     companion object : ULIDComponentFactory {
-        override val bitMask = Consts.BIT_MASK_48
-        override val bitSize = Consts.TIMESTAMP_BIT_SIZE
+        override val bitMask = 0xffffffffffffL
+        override val bitSize = 48
         override val base32StringLength = 10
 
         fun fromDecodedBytes(byteList: List<Long>) = Timestamp(byteList)
