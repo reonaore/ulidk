@@ -1,5 +1,7 @@
 package io.github.reonaore.ulidk
 
+import io.github.reonaore.ulidk.internal.Base32Decoder
+import io.github.reonaore.ulidk.internal.ULIDConstants
 import io.github.reonaore.ulidk.internal.SecureRandomGenerator
 import io.github.reonaore.ulidk.internal.getSecureRandomGenerator
 import kotlinx.io.Buffer

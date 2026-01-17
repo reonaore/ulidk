@@ -1,4 +1,4 @@
-package io.github.reonaore.ulidk
+package io.github.reonaore.ulidk.internal
 
 internal object ULIDConstants {
     const val TIMESTAMP_BIT_SIZE = 48

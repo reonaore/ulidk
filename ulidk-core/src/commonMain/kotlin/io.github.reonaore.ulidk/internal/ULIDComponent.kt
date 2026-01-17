@@ -1,5 +1,7 @@
-package io.github.reonaore.ulidk
+package io.github.reonaore.ulidk.internal
 
+import io.github.reonaore.ulidk.internal.Base32Encoder
+import io.github.reonaore.ulidk.internal.BinaryReadWriter
 import kotlinx.io.Sink
 
 internal abstract class ULIDComponent(

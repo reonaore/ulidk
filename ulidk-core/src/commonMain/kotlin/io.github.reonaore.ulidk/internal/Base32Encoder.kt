@@ -1,4 +1,5 @@
-package io.github.reonaore.ulidk
+package io.github.reonaore.ulidk.internal
+import io.github.reonaore.ulidk.ULIDParseException
 
 import kotlinx.io.Sink
 
