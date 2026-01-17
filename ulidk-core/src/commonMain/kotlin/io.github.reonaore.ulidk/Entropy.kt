@@ -1,9 +1,8 @@
 package io.github.reonaore.ulidk
 
-import io.github.reonaore.ulidk.internal.decodeBase32Bytes
-import io.github.reonaore.ulidk.internal.BinaryReadWriter
-import io.github.reonaore.ulidk.internal.ULIDComponent
 import io.github.reonaore.ulidk.internal.Consts
+import io.github.reonaore.ulidk.internal.ULIDComponent
+import io.github.reonaore.ulidk.internal.decodeBase32Bytes
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.readByteArray
@@ -92,33 +91,17 @@ internal data class Entropy(
  * @property value this value has 40 bits
  */
 internal class EntropyValue(value: Long) : ULIDComponent(value, Consts.BIT_MASK_40) {
-    override val base32StringLength = 8
+    override val base32StringLength = BASE32_STRING_LENGTH
 
     companion object {
-            val bitSize = Consts.ENTROPY_VALUE_BIT_SIZE
-            val base32StringLength = 8
+        private const val BASE32_STRING_LENGTH = 8
         const val BYTE_SIZE = Consts.ENTROPY_VALUE_BYTE_SIZE
-
-        @Throws(IllegalArgumentException::class)
-        private fun decodeBytes(bytes: List<Long>): Long =
-            decodeBase32Bytes(bytes, base32StringLength)
-        private fun parseBinary(binary: ByteArray): Long {
-            require(binary.size == BYTE_SIZE) {
-                "Binary length must be $BYTE_SIZE"
-            }
-            var res = 0L
-            val startBits = bitSize - 8
-            (startBits downTo 0 step 8).forEachIndexed { index, shiftBits ->
-                res = res or ((binary[index].toLong() and 0xFF) shl shiftBits)
-            }
-            return res
-        }
     }
 
     operator fun inc() = EntropyValue(value + 1)
 
-    constructor(byteList: List<Long>) : this(Companion.decodeBytes(byteList))
-    constructor(binary: ByteArray) : this(parseBinary(binary))
+    constructor(byteList: List<Long>) : this(decodeBase32Bytes(byteList, BASE32_STRING_LENGTH))
+    constructor(binary: ByteArray) : this(parseBinary(binary, Consts.ENTROPY_VALUE_BIT_SIZE))
 
     /**
      * @return true if the value is 40bits all high
