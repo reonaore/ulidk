@@ -1,31 +1,23 @@
 package io.github.reonaore.ulidk
 
-import kotlinx.io.Sink
+import io.github.reonaore.ulidk.internal.ULIDComponent
+import io.github.reonaore.ulidk.internal.ULIDComponentFactory
 
 /**
  * This class stands for timestamp part of ULID
  * @property value timestamp which is 48 bits
  */
-internal class Timestamp(
-    value: Long
-) {
-    val value = value and BIT_MASK
+internal class Timestamp : ULIDComponent {
+    constructor(value: Long) : super(Companion, value)
+    constructor(byteList: List<Long>) : super(Companion, byteList)
+    constructor(binary: ByteArray) : super(Companion, binary)
 
-    companion object : Base32Encoder, BinaryReadWriter {
-        override val base32StringLength = 10
+    companion object : ULIDComponentFactory {
+        override val bitMask = 0xffffffffffffL
         override val bitSize = 48
-        private const val BIT_MASK = 0xffffffffffff
+        override val base32StringLength = 10
 
-        fun fromDecodedBytes(byteList: List<Long>): Timestamp {
-            return Timestamp(decodeBytes(byteList))
-        }
-
-        fun fromBinary(bin: ByteArray): Timestamp {
-            return Timestamp(readBinary(bin))
-        }
+        fun fromDecodedBytes(byteList: List<Long>) = Timestamp(byteList)
+        fun fromBinary(bin: ByteArray) = Timestamp(bin)
     }
-
-    fun writeBase32(buf: Sink) = buf.writeBase32(value)
-
-    fun write(buf: Sink) = buf.writeBinary(value)
 }

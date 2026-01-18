@@ -1,5 +1,7 @@
 package io.github.reonaore.ulidk
 
+import io.github.reonaore.ulidk.internal.ULIDComponent
+import io.github.reonaore.ulidk.internal.ULIDComponentFactory
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.readByteArray
@@ -16,8 +18,8 @@ internal data class Entropy(
 ) {
 
     companion object {
-
         internal const val BYTE_SIZE = 10
+        private const val VALUE_BYTE_SIZE = 5
 
         /**
          * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
@@ -39,8 +41,8 @@ internal data class Entropy(
                 "Binary length must be $BYTE_SIZE"
             }
             return Entropy(
-                msb = EntropyValue(binary.copyOfRange(0, EntropyValue.BYTE_SIZE)),
-                lsb = EntropyValue(binary.copyOfRange(EntropyValue.BYTE_SIZE, BYTE_SIZE))
+                msb = EntropyValue(binary.copyOfRange(0, VALUE_BYTE_SIZE)),
+                lsb = EntropyValue(binary.copyOfRange(VALUE_BYTE_SIZE, BYTE_SIZE))
             )
         }
     }
@@ -87,42 +89,24 @@ internal data class Entropy(
  * This class stands for variable which has 40 bits
  * @property value this value has 40 bits
  */
-internal class EntropyValue(value: Long) {
+internal class EntropyValue : ULIDComponent {
+    constructor(value: Long) : super(Companion, value)
+    constructor(byteList: List<Long>) : super(Companion, byteList)
+    constructor(binary: ByteArray) : super(Companion, binary)
 
-    val value = value and BIT_MASK
+    companion object : ULIDComponentFactory {
+        private const val BIT_MASK_40 = 0xffffffffffL
+        private const val ENTROPY_VALUE_BIT_SIZE = 40
 
-    companion object : Base32Encoder, BinaryReadWriter {
-        override val bitSize = 40
+        override val bitMask = BIT_MASK_40
+        override val bitSize = ENTROPY_VALUE_BIT_SIZE
         override val base32StringLength = 8
-        private const val BIT_MASK = 0xffffffffff
-        const val BYTE_SIZE = 5
-
-        @Throws(IllegalArgumentException::class)
-        private fun parseBinary(binary: ByteArray): Long {
-            require(binary.size == BYTE_SIZE) {
-                "Binary length must be $BYTE_SIZE"
-            }
-            return readBinary(binary)
-        }
     }
 
     operator fun inc() = EntropyValue(value + 1)
 
-    constructor(byteList: List<Long>) : this(decodeBytes(byteList))
-    constructor(binary: ByteArray) : this(parseBinary(binary))
-
-    /**
-     * Write the value as binary
-     */
-    fun write(buf: Sink) = buf.writeBinary(value)
-
-    /**
-     * Write the value with Base32 encoded to buffer
-     */
-    fun writeBase32(buf: Sink) = buf.writeBase32(value)
-
     /**
      * @return true if the value is 40bits all high
      */
-    fun isFull() = value == BIT_MASK
+    fun isFull() = value == BIT_MASK_40
 }
