@@ -1,10 +1,10 @@
 package io.github.reonaore.ulidk
 
+import io.github.reonaore.ulidk.internal.Base32Decoder
 import io.github.reonaore.ulidk.internal.SecureRandomGenerator
 import io.github.reonaore.ulidk.internal.getSecureRandomGenerator
 import kotlinx.io.Buffer
 import kotlinx.io.Source
-import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -27,14 +27,13 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalTime::class)
 @Serializable(with = ULID.Serializer::class)
 class ULID internal constructor(
-    private val timestamp: Timestamp,
-    private val entropy: Entropy,
+    internal val timestamp: Timestamp,
+    internal val entropy: Entropy,
 ) : Comparable<ULID> {
-
     companion object {
-        private const val BINARY_SIZE = 16
         private const val TIMESTAMP_BINARY_SIZE = 6
         private const val STRING_LENGTH = 26
+        private const val BINARY_SIZE = 16
 
         private val random = getSecureRandomGenerator()
 
@@ -60,9 +59,15 @@ class ULID internal constructor(
          */
         @Suppress("MagicNumber")
         fun fromString(str: String): ULID {
-            require(str.length == STRING_LENGTH) { "String length must be $STRING_LENGTH" }
+            require(str.length == STRING_LENGTH) {
+                "ULID string must be $STRING_LENGTH characters long, got ${str.length}"
+            }
 
-            val byteList = Base32Decoder.decodeBase32(str)
+            val byteList = try {
+                Base32Decoder.decodeBase32(str)
+            } catch (e: IllegalArgumentException) {
+                throw ULIDParseException("Invalid Base32 characters in ULID string: $str", e)
+            }
             return ULID(
                 timestamp = Timestamp.fromDecodedBytes(byteList.subList(0, 10)),
                 entropy = Entropy.fromDecodedBytes(byteList.subList(10, 26)),
@@ -80,38 +85,16 @@ class ULID internal constructor(
          * Generates ULID from UUID
          */
         @OptIn(ExperimentalUuidApi::class)
+        @Suppress("MagicNumber")
         fun fromUUID(uuid: Uuid): ULID {
-            return with(Buffer()) {
-                uuid.toLongs { mostSignificantBits, leastSignificantBits ->
-                    writeLong(mostSignificantBits)
-                    writeLong(leastSignificantBits)
-                    fromBinary(readByteArray())
+            val bin = ByteArray(16)
+            uuid.toLongs { mostSig, leastSig ->
+                for (i in 0..7) {
+                    bin[i] = (mostSig shr (56 - i * 8)).toByte()
+                    bin[i + 8] = (leastSig shr (56 - i * 8)).toByte()
                 }
             }
-        }
-    }
-
-    /**
-     * MonotonicGenerator generates new monotonic ULIDs.
-     * @constructor creates its instance from an ULID.
-     * @property timestamp timestamp of the base ULID.
-     * @property entropy entropy of the base ULID. This is updated when a new ULID is generated.
-     */
-    class MonotonicGenerator(ulid: ULID = randomULID()) {
-        private var timestamp = ulid.timestamp.value
-        private var entropy = ulid.entropy
-
-        /**
-         * Generate a new monotonic ULID.
-         * @param timestamp timestamp of newly generated ULID.
-         * @return monotonic ULID
-         * @throws IllegalArgumentException when entropy is overflowed
-         */
-        operator fun invoke(timestamp: Long = this.timestamp): ULID {
-            require(!entropy.isFull()) {
-                throw IllegalStateException("Entropy will be overflowed")
-            }
-            return ULID(timestamp = Timestamp(timestamp), entropy = ++entropy)
+            return fromBinary(bin)
         }
     }
 

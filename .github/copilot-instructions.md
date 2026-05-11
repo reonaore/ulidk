@@ -9,7 +9,7 @@ ulidk is a Kotlin Multiplatform implementation of the ULID (Universally Unique L
 - **Platforms**: JVM, JavaScript (browser/node), iOS, macOS, Linux, Android, WASM JS/WASI
 - **Key Classes**:
   - `ULID`: Main class with companion factory methods
-  - `ULID.MonotonicGenerator`: For monotonic ULID generation
+  - `ULIDMonotonicGenerator`: For monotonic ULID generation
   - Internal: `Timestamp`, `Entropy`, `Base32Encoder/Decoder`
 
 ## Build & Development
@@ -22,7 +22,7 @@ ulidk is a Kotlin Multiplatform implementation of the ULID (Universally Unique L
 ## Code Patterns
 - **ULID Generation**: `ULID.randomULID(timestamp = Clock.System.now().toEpochMilliseconds())`
 - **String Decoding**: `ULID.fromString("01H7PN3EH10123456789ABCDEF")`
-- **Monotonic ULIDs**: `val gen = ULID.MonotonicGenerator(); gen()`
+- **Monotonic ULIDs**: `val gen = ULIDMonotonicGenerator(); gen()`
 - **Serialization**: Built-in Kotlinx.serialization support
 - **UUID Compatibility**: `ULID.fromUUID(uuid)` and `ulid.toUUID()`
 - **Lazy Properties**: Binary and string representations cached with `by lazy`

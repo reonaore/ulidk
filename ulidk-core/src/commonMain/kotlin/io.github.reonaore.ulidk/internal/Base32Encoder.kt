@@ -1,4 +1,5 @@
-package io.github.reonaore.ulidk
+package io.github.reonaore.ulidk.internal
+import io.github.reonaore.ulidk.ULIDParseException
 
 import kotlinx.io.Sink
 
@@ -30,11 +31,20 @@ internal interface Base32Encoder {
     }
 }
 
+internal fun decodeBase32Bytes(bytes: List<Long>, base32StringLength: Int): Long {
+    var res = 0L
+    val bits = (base32StringLength - 1) * BIT_NUM
+    (bits downTo 0 step BIT_NUM).forEachIndexed { index, shiftBits ->
+        res = res or ((bytes[index] and BIT_MASK) shl shiftBits)
+    }
+    return res
+}
+
 internal object Base32Decoder {
     fun decodeBase32(str: String): List<Long> {
         return str.toList().map {
             base32LookUp[it]?.and(BIT_MASK)
-                ?: throw IllegalArgumentException("Input string has some invalid chars")
+                ?: throw ULIDParseException("Invalid character '${it}' in Base32 string")
         }
     }
 }
