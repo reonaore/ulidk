@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 dokka = "2.2.0"
 detekt = "1.23.8"
 kover = "0.9.8"
@@ -8,7 +8,7 @@ kotlinx-io = "0.9.0"
 kotlinx-datetime = "0.8.0-0.6.x-compat"
 kotlinx-serialization = "1.11.0"
 kotlinx-benchmark = "0.4.17"
-publish = "0.36.0"
+publish = "0.37.0"
 kotlincrypto = "0.6.0"
 androidGradlePlugin = "8.13.0"
 
