@@ -9,7 +9,11 @@ import kotlinx.io.Sink
 internal class Timestamp(
     value: Long
 ) {
-    val value = value and BIT_MASK
+    val value = value.also {
+        require(it in 0..BIT_MASK) {
+            "Timestamp must be between 0 and $BIT_MASK"
+        }
+    }
 
     companion object : Base32Encoder, BinaryReadWriter {
         override val base32StringLength = 10

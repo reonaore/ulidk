@@ -33,7 +33,7 @@ internal interface Base32Encoder {
 internal object Base32Decoder {
     fun decodeBase32(str: String): List<Long> {
         return str.toList().map {
-            base32LookUp[it]?.and(BIT_MASK)
+            base32LookUp[it.uppercaseChar()]?.and(BIT_MASK)
                 ?: throw IllegalArgumentException("Input string has some invalid chars")
         }
     }
