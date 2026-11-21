@@ -1,6 +1,5 @@
-package ulidk
+package io.github.reonaore.ulidk
 
-import io.github.reonaore.ulidk.Timestamp
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlin.test.Test

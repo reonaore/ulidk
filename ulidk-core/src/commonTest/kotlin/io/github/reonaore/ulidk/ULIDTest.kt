@@ -1,14 +1,11 @@
-package ulidk
+package io.github.reonaore.ulidk
 
-import io.github.reonaore.ulidk.Entropy
-import io.github.reonaore.ulidk.Timestamp
-import io.github.reonaore.ulidk.ULID
+import io.github.reonaore.ulidk.internal.SecureRandomGenerator
 import kotlinx.io.readByteArray
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -20,6 +17,18 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 class ULIDTest {
+
+    private class FakeSecureRandomGenerator(
+        private vararg val values: ByteArray,
+    ) : SecureRandomGenerator {
+        private var index = 0
+
+        override fun nextBytes(length: Int): ByteArray {
+            return values[index++].also {
+                require(it.size == length)
+            }
+        }
+    }
 
     @Test
     fun generate() {
@@ -72,9 +81,17 @@ class ULIDTest {
     @Test
     fun decodeOverflowValue() {
         val input = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-        val got = ULID.fromString(input).toString()
+        assertFailsWith<IllegalArgumentException> {
+            ULID.fromString(input)
+        }
+    }
 
-        assertEquals("0ZZZZZZZZZZZZZZZZZZZZZZZZZ", got)
+    @Test
+    fun decodeIsCaseInsensitive() {
+        val expected = "01H7PN3EH10123456789ABCDEF"
+
+        assertEquals(expected, ULID.fromString(expected.lowercase()).toString())
+        assertEquals(expected, ULID.fromString("01h7Pn3eH10123456789aBcDeF").toString())
     }
 
     @Test
@@ -103,6 +120,22 @@ class ULIDTest {
     }
 
     @Test
+    fun binaryCanBeReadRepeatedly() {
+        val testee = ULID.fromString("01H7T3YRWCWRVRSBJ24CCBTNKY")
+        val expected = testee.binary.readByteArray().toList()
+
+        assertEquals(expected, testee.binary.readByteArray().toList())
+        assertEquals(expected, testee.binaryBytes.toList())
+        assertEquals(testee.toUUID(), testee.toUUID())
+        assertEquals(expected, testee.binary.readByteArray().toList())
+
+        val mutableCopy = testee.binaryBytes
+        mutableCopy.fill(0)
+        assertEquals(expected, testee.binaryBytes.toList())
+        assertEquals(expected, testee.binary.readByteArray().toList())
+    }
+
+    @Test
     fun monotonicNormal() {
         val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY")
         val ulidGen = ULID.MonotonicGenerator(input)
@@ -114,8 +147,72 @@ class ULIDTest {
     fun monotonicEdgeCase() {
         val ulidGen = ULID.MonotonicGenerator(ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY"))
         assertEquals("01BX5ZZKBKZZZZZZZZZZZZZZZZ", ulidGen().toString())
-        assertFails {
+        assertFailsWith<IllegalStateException> {
             ulidGen().toString()
+        }
+    }
+
+    @Test
+    fun monotonicPreservesOrderWhenTimeRegresses() {
+        val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY")
+        val ulidGen = ULID.MonotonicGenerator.withRandom(
+            input,
+            FakeSecureRandomGenerator(ByteArray(Entropy.BYTE_SIZE)),
+        )
+
+        val sameTimestamp = ulidGen()
+        val lowerTimestamp = ulidGen(input.timestamp() - 1)
+
+        assertEquals(input.timestamp(), sameTimestamp.timestamp())
+        assertEquals(input.timestamp(), lowerTimestamp.timestamp())
+        assertTrue(sameTimestamp < lowerTimestamp)
+    }
+
+    @Test
+    fun monotonicReseedsAndTracksNewTimestamp() {
+        val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY")
+        val newEntropy = ByteArray(Entropy.BYTE_SIZE)
+        val ulidGen = ULID.MonotonicGenerator.withRandom(
+            input,
+            FakeSecureRandomGenerator(newEntropy),
+        )
+
+        val advanced = ulidGen(input.timestamp() + 1)
+        val following = ulidGen()
+
+        assertEquals(input.timestamp() + 1, advanced.timestamp())
+        assertEquals(newEntropy.toList(), advanced.entropy().toList())
+        assertEquals(advanced.timestamp(), following.timestamp())
+        assertTrue(advanced < following)
+    }
+
+    @Test
+    fun monotonicCanAdvanceAfterEntropyIsFull() {
+        val input = ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZZ")
+        val newEntropy = ByteArray(Entropy.BYTE_SIZE)
+        val ulidGen = ULID.MonotonicGenerator.withRandom(
+            input,
+            FakeSecureRandomGenerator(newEntropy),
+        )
+
+        val got = ulidGen(input.timestamp() + 1)
+
+        assertEquals(input.timestamp() + 1, got.timestamp())
+        assertEquals(newEntropy.toList(), got.entropy().toList())
+    }
+
+    @Test
+    fun invalidTimestampIsRejected() {
+        val random = FakeSecureRandomGenerator(ByteArray(Entropy.BYTE_SIZE))
+
+        assertFailsWith<IllegalArgumentException> {
+            ULID.randomULID(timestamp = -1, random = random)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            ULID.randomULID(timestamp = 0x1000000000000, random = random)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            ULID.MonotonicGenerator(ULID.fromString("00000000000000000000000000"))(-1)
         }
     }
 

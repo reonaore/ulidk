@@ -20,6 +20,13 @@ repositories {
     mavenCentral()
 }
 
+detekt {
+    source.setFrom(
+        "src/commonMain/kotlin",
+        "src/commonTest/kotlin",
+    )
+}
+
 kotlin {
     jvm {
         tasks.withType<Test>().configureEach {

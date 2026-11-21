@@ -48,8 +48,9 @@ class ULID internal constructor(
             timestamp: Long = Clock.System.now().toEpochMilliseconds(),
             random: SecureRandomGenerator = Companion.random
         ): ULID {
+            val validTimestamp = Timestamp(timestamp)
             val entropy = random.nextBytes(Entropy.BYTE_SIZE)
-            return ULID(Timestamp(timestamp), Entropy.fromBinary(entropy))
+            return ULID(validTimestamp, Entropy.fromBinary(entropy))
         }
 
         /**
@@ -97,7 +98,19 @@ class ULID internal constructor(
      * @property timestamp timestamp of the base ULID.
      * @property entropy entropy of the base ULID. This is updated when a new ULID is generated.
      */
-    class MonotonicGenerator(ulid: ULID = randomULID()) {
+    class MonotonicGenerator private constructor(
+        ulid: ULID,
+        private val random: SecureRandomGenerator,
+    ) {
+        constructor(ulid: ULID = randomULID()) : this(ulid, ULID.random)
+
+        internal companion object {
+            fun withRandom(
+                ulid: ULID,
+                random: SecureRandomGenerator,
+            ) = MonotonicGenerator(ulid, random)
+        }
+
         private var timestamp = ulid.timestamp.value
         private var entropy = ulid.entropy
 
@@ -105,13 +118,21 @@ class ULID internal constructor(
          * Generate a new monotonic ULID.
          * @param timestamp timestamp of newly generated ULID.
          * @return monotonic ULID
-         * @throws IllegalArgumentException when entropy is overflowed
+         * @throws IllegalStateException when entropy is overflowed
          */
         operator fun invoke(timestamp: Long = this.timestamp): ULID {
-            require(!entropy.isFull()) {
-                throw IllegalStateException("Entropy will be overflowed")
+            val requestedTimestamp = Timestamp(timestamp).value
+            if (requestedTimestamp > this.timestamp) {
+                val nextEntropy = Entropy.fromBinary(random.nextBytes(Entropy.BYTE_SIZE))
+                this.timestamp = requestedTimestamp
+                entropy = nextEntropy
+            } else {
+                check(!entropy.isFull()) {
+                    "Entropy will be overflowed"
+                }
+                entropy++
             }
-            return ULID(timestamp = Timestamp(timestamp), entropy = ++entropy)
+            return ULID(timestamp = Timestamp(this.timestamp), entropy = entropy)
         }
     }
 
@@ -145,13 +166,26 @@ class ULID internal constructor(
      */
     fun entropy(): ByteArray = entropy.binary
 
-    val binary: Source by lazy {
+    private val binaryValue: ByteArray by lazy {
         with(Buffer()) {
             timestamp.write(this)
             entropy.write(this)
-            this
+            readByteArray()
         }
     }
+
+    /**
+     * The 16-byte binary representation of this ULID.
+     *
+     * A defensive copy is returned so callers cannot mutate this ULID's cached representation.
+     */
+    val binaryBytes: ByteArray
+        get() = binaryValue.copyOf()
+
+    val binary: Source
+        get() = Buffer().apply {
+            write(binaryValue)
+        }
 
     private val str: String by lazy {
         with(Buffer()) {
@@ -165,23 +199,38 @@ class ULID internal constructor(
      * @return Base32 encoded string
      */
     override fun toString() = str
+
     override fun compareTo(other: ULID): Int {
-        return str.compareTo(other.str)
+        val timestampComparison = timestamp.value.compareTo(other.timestamp.value)
+        val entropyMsbComparison = entropy.msb.value.compareTo(other.entropy.msb.value)
+        return when {
+            timestampComparison != 0 -> timestampComparison
+            entropyMsbComparison != 0 -> entropyMsbComparison
+            else -> entropy.lsb.value.compareTo(other.entropy.lsb.value)
+        }
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ULID) return false
-        return str == other.str
+        return timestamp.value == other.timestamp.value &&
+            entropy.msb.value == other.entropy.msb.value &&
+            entropy.lsb.value == other.entropy.lsb.value
     }
 
     override fun hashCode(): Int {
-        return str.hashCode()
+        var result = timestamp.value.hashCode()
+        result = 31 * result + entropy.msb.value.hashCode()
+        result = 31 * result + entropy.lsb.value.hashCode()
+        return result
     }
 
     @OptIn(ExperimentalUuidApi::class)
+    @Suppress("MagicNumber")
     fun toUUID(): Uuid {
-        return Uuid.fromLongs(binary.readLong(), binary.readLong())
+        val mostSignificantBits = (timestamp.value shl 16) or (entropy.msb.value ushr 24)
+        val leastSignificantBits = ((entropy.msb.value and 0xFFFFFFL) shl 40) or entropy.lsb.value
+        return Uuid.fromLongs(mostSignificantBits, leastSignificantBits)
     }
 
 }

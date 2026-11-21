@@ -1,7 +1,5 @@
-package ulidk
+package io.github.reonaore.ulidk
 
-import io.github.reonaore.ulidk.Entropy
-import io.github.reonaore.ulidk.EntropyValue
 import kotlinx.io.Buffer
 import kotlinx.io.readString
 import kotlin.test.Test
