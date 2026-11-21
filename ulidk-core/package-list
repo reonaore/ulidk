@@ -21,6 +21,7 @@ $dokka.location:io.github.reonaore.ulidk/ULID.Serializer/deserialize/#kotlinx.se
 $dokka.location:io.github.reonaore.ulidk/ULID.Serializer/serialize/#kotlinx.serialization.encoding.Encoder#io.github.reonaore.ulidk.ULID/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/-serializer/serialize.html
 $dokka.location:io.github.reonaore.ulidk/ULID///PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/index.html
 $dokka.location:io.github.reonaore.ulidk/ULID/binary/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/binary.html
+$dokka.location:io.github.reonaore.ulidk/ULID/binaryBytes/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/binary-bytes.html
 $dokka.location:io.github.reonaore.ulidk/ULID/compareTo/#io.github.reonaore.ulidk.ULID/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/compare-to.html
 $dokka.location:io.github.reonaore.ulidk/ULID/entropy/#/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/entropy.html
 $dokka.location:io.github.reonaore.ulidk/ULID/equals/#kotlin.Any?/PointingToDeclaration/ulidk-core/io.github.reonaore.ulidk/-u-l-i-d/equals.html
