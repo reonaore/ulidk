@@ -99,6 +99,10 @@ detekt {
     source.setFrom("src/commonMain/kotlin", "src/commonTest/kotlin")
 }
 
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "1.8"
+}
+
 mavenPublishing {
     coordinates(project.group.toString(), project.name, project.version.toString())
     publishToMavenCentral()
