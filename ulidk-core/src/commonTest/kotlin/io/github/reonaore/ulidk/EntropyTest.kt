@@ -4,6 +4,7 @@ import kotlinx.io.Buffer
 import kotlinx.io.readString
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class EntropyTest {
 
@@ -78,5 +79,12 @@ class EntropyTest {
 
         assertEquals(first, second)
         assertEquals(first.hashCode(), second.hashCode())
+    }
+
+    @Test
+    fun rejectsWrongBase32EntropyLength() {
+        assertFailsWith<IllegalArgumentException> {
+            Entropy.fromBase32Digits(List(15) { 0L })
+        }
     }
 }
