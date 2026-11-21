@@ -42,7 +42,7 @@ kotlin {
     macosArm64()
     linuxX64()
 
-    androidLibrary {
+    android {
         namespace = "io.github.reonaore.ulidk"
         compileSdk = 33
         minSdk = 24
