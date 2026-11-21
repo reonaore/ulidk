@@ -13,7 +13,7 @@ import kotlinx.io.readByteArray
 internal data class Entropy(
     val msb: EntropyValue,
     val lsb: EntropyValue,
-) {
+) : Comparable<Entropy> {
 
     companion object {
 
@@ -81,20 +81,26 @@ internal data class Entropy(
      * @return true if the value has 80bits all high
      */
     fun isFull() = msb.isFull() && lsb.isFull()
+
+    override fun compareTo(other: Entropy): Int {
+        val msbComp = msb.compareTo(other.msb)
+        if (msbComp != 0) return msbComp
+        return lsb.compareTo(other.lsb)
+    }
 }
 
 /**
  * This class stands for variable which has 40 bits
  * @property value this value has 40 bits
  */
-internal class EntropyValue(value: Long) {
+internal class EntropyValue(value: Long) : Comparable<EntropyValue> {
 
     val value = value and BIT_MASK
 
     companion object : Base32Encoder, BinaryReadWriter {
         override val bitSize = 40
         override val base32StringLength = 8
-        private const val BIT_MASK = 0xffffffffff
+        private const val BIT_MASK = 0xffffffffffL
         const val BYTE_SIZE = 5
 
         @Throws(IllegalArgumentException::class)
@@ -125,4 +131,14 @@ internal class EntropyValue(value: Long) {
      * @return true if the value is 40bits all high
      */
     fun isFull() = value == BIT_MASK
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is EntropyValue) return false
+        return value == other.value
+    }
+
+    override fun hashCode(): Int = value.hashCode()
+
+    override fun compareTo(other: EntropyValue): Int = value.compareTo(other.value)
 }

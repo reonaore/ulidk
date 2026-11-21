@@ -1,8 +1,5 @@
-package ulidk
+package io.github.reonaore.ulidk
 
-import io.github.reonaore.ulidk.Entropy
-import io.github.reonaore.ulidk.Timestamp
-import io.github.reonaore.ulidk.ULID
 import kotlinx.io.readByteArray
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -72,9 +69,9 @@ class ULIDTest {
     @Test
     fun decodeOverflowValue() {
         val input = "8ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-        val got = ULID.fromString(input).toString()
-
-        assertEquals("0ZZZZZZZZZZZZZZZZZZZZZZZZZ", got)
+        assertFailsWith<IllegalArgumentException> {
+            ULID.fromString(input)
+        }
     }
 
     @Test
@@ -157,5 +154,31 @@ class ULIDTest {
         // hash
         assertTrue { ulid.hashCode() == ULID.fromString(ulid.toString()).hashCode() }
         assertFalse { ulid.hashCode() == ULID.hashCode() }
+    }
+
+    @Test
+    fun toUuidAndBinaryAreIdempotent() {
+        val ulid = ULID.randomULID()
+        val uuid1 = ulid.toUUID()
+        val uuid2 = ulid.toUUID()
+        assertEquals(uuid1, uuid2)
+
+        val bin1 = ulid.binary.readByteArray()
+        val bin2 = ulid.binary.readByteArray()
+        assertEquals(bin1.toList(), bin2.toList())
+        assertEquals(bin1.toList(), ulid.binaryBytes.toList())
+    }
+
+    @Test
+    fun monotonicTimestampOrdering() {
+        val initial = ULID.randomULID(timestamp = 150000)
+        val gen = ULID.MonotonicGenerator(initial)
+
+        val lower = gen(100000)
+        assertEquals(150000, lower.timestamp())
+
+        val higher = gen(200000)
+        assertEquals(200000, higher.timestamp())
+        assertTrue { higher > lower }
     }
 }

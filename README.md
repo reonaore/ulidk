@@ -1,12 +1,12 @@
 ![build](https://github.com/reonaore/ulidk/actions/workflows/build.yaml/badge.svg)
-[![Kotlin](https://img.shields.io/badge/kotlin-2.2.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.3.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![codecov](https://codecov.io/gh/reonaore/ulidk/graph/badge.svg?token=27FPKJM9IU)](https://codecov.io/gh/reonaore/ulidk)
 
 # What?
 
-[ULID](https://github.com/ulid/spec) implementation in Kotin.
+[ULID](https://github.com/ulid/spec) implementation in Kotlin.
 
 See [kDoc](https://reonaore.github.io/ulidk/) to see the specification.
 
@@ -43,19 +43,19 @@ Add dependency.
 To generate a ULID, call `randomULID()`.
 
 ```kotlin
-import io.onare.ulidk.ULID
+import io.github.reonaore.ulidk.ULID
 
 val ulid: ULID = ULID.randomULID()
 val ulidString = ulid.toString() // e.g. 01ARZ3NDEKTSV4RRFFQ69G5FAV
-val ulidBinary = ulid.binary // 16 bytes binary of the ULID
+val ulidBinary = ulid.binary // 16 bytes binary of the ULID (or ulid.binaryBytes)
 ```
 
 ## Decode from string
 
 ```kotlin
-import io.onare.ulidk.ULID
+import io.github.reonaore.ulidk.ULID
 
-val ulid: ULID = ULID.fromString("01ARZ3NDEKTSV4RRFFQ69G5FAV").getOrThrow()
+val ulid: ULID = ULID.fromString("01ARZ3NDEKTSV4RRFFQ69G5FAV")
 val timestamp: Long = ulid.timestamp() // 48bit unix time of the ULID
 val entropy: ByteArray = ulid.entropy() // randomness of the ULID
 ```
@@ -63,8 +63,7 @@ val entropy: ByteArray = ulid.entropy() // randomness of the ULID
 ## Monotonic ULIDs
 
 ```kotlin
-
-import io.onare.ulidk.ULID
+import io.github.reonaore.ulidk.ULID
 
 val ulidGen = ULID.MonotonicGenerator(ULID.randomULID(150000))
 
@@ -82,12 +81,14 @@ ulidGen(100000) // 000XAL6S41ACTAV9WEVGEMMVRD
 ## UUID compatibility
 
 ```kotlin
-import io.onare.ulidk.ULID
-import java.util.*
+import io.github.reonaore.ulidk.ULID
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
-val uuid = UUID.randomUUID()
+@OptIn(ExperimentalUuidApi::class)
+val uuid = Uuid.random()
 val ulid = ULID.fromUUID(uuid)
-assert(uuid.toString() == ulid.toUUID().toString())
+assert(uuid == ulid.toUUID())
 ```
 
 ## Test

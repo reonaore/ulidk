@@ -1,10 +1,10 @@
-package ulidk
+package io.github.reonaore.ulidk
 
-import io.github.reonaore.ulidk.Timestamp
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class TimestampTest {
     @Test
@@ -16,5 +16,15 @@ class TimestampTest {
         assertEquals(ByteArray(6) { (it + 1).toByte() }.toList(), b.toList())
         val got = Timestamp.fromBinary(b)
         assertEquals(input, got.value)
+    }
+
+    @Test
+    fun overflowThrows() {
+        assertFailsWith<IllegalArgumentException> {
+            Timestamp(-1L)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            Timestamp(0x1000000000000L)
+        }
     }
 }

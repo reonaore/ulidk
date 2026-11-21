@@ -27,7 +27,11 @@ kotlin {
         }
     }
     js {
-        browser()
+        browser {
+            testTask {
+                enabled = System.getenv("CHROME_BIN") != null || System.getenv("CI") != null
+            }
+        }
         nodejs()
         binaries.library()
     }
@@ -58,7 +62,11 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        browser()
+        browser {
+            testTask {
+                enabled = System.getenv("CHROME_BIN") != null || System.getenv("CI") != null
+            }
+        }
         nodejs()
     }
     @OptIn(ExperimentalWasmDsl::class)
@@ -85,6 +93,10 @@ kotlin {
             }
         }
     }
+}
+
+detekt {
+    source.setFrom("src/commonMain/kotlin", "src/commonTest/kotlin")
 }
 
 mavenPublishing {
