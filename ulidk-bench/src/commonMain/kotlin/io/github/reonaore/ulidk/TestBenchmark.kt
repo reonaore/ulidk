@@ -56,7 +56,7 @@ class TestBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     @OutputTimeUnit(BenchmarkTimeUnit.NANOSECONDS)
     fun monoGenerationAverage(): String {
-        return monoULID.toString()
+        return monoULID().toString()
     }
 
     @Benchmark

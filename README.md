@@ -49,6 +49,7 @@ import kotlinx.io.readByteArray
 val ulid: ULID = ULID.randomULID()
 val ulidString = ulid.toString() // e.g. 01ARZ3NDEKTSV4RRFFQ69G5FAV
 val ulidBinary = ulid.binary.readByteArray() // 16 bytes binary of the ULID
+val ulidBinaryBytes = ulid.binaryBytes // 16-byte defensive copy
 ```
 
 ## Decode from string

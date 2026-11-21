@@ -125,7 +125,13 @@ class ULIDTest {
         val expected = testee.binary.readByteArray().toList()
 
         assertEquals(expected, testee.binary.readByteArray().toList())
+        assertEquals(expected, testee.binaryBytes.toList())
         assertEquals(testee.toUUID(), testee.toUUID())
+        assertEquals(expected, testee.binary.readByteArray().toList())
+
+        val mutableCopy = testee.binaryBytes
+        mutableCopy.fill(0)
+        assertEquals(expected, testee.binaryBytes.toList())
         assertEquals(expected, testee.binary.readByteArray().toList())
     }
 

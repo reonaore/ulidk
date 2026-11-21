@@ -166,7 +166,7 @@ class ULID internal constructor(
      */
     fun entropy(): ByteArray = entropy.binary
 
-    private val binaryBytes: ByteArray by lazy {
+    private val binaryValue: ByteArray by lazy {
         with(Buffer()) {
             timestamp.write(this)
             entropy.write(this)
@@ -174,9 +174,17 @@ class ULID internal constructor(
         }
     }
 
+    /**
+     * The 16-byte binary representation of this ULID.
+     *
+     * A defensive copy is returned so callers cannot mutate this ULID's cached representation.
+     */
+    val binaryBytes: ByteArray
+        get() = binaryValue.copyOf()
+
     val binary: Source
         get() = Buffer().apply {
-            write(binaryBytes)
+            write(binaryValue)
         }
 
     private val str: String by lazy {
@@ -191,24 +199,38 @@ class ULID internal constructor(
      * @return Base32 encoded string
      */
     override fun toString() = str
+
     override fun compareTo(other: ULID): Int {
-        return str.compareTo(other.str)
+        val timestampComparison = timestamp.value.compareTo(other.timestamp.value)
+        val entropyMsbComparison = entropy.msb.value.compareTo(other.entropy.msb.value)
+        return when {
+            timestampComparison != 0 -> timestampComparison
+            entropyMsbComparison != 0 -> entropyMsbComparison
+            else -> entropy.lsb.value.compareTo(other.entropy.lsb.value)
+        }
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ULID) return false
-        return str == other.str
+        return timestamp.value == other.timestamp.value &&
+            entropy.msb.value == other.entropy.msb.value &&
+            entropy.lsb.value == other.entropy.lsb.value
     }
 
     override fun hashCode(): Int {
-        return str.hashCode()
+        var result = timestamp.value.hashCode()
+        result = 31 * result + entropy.msb.value.hashCode()
+        result = 31 * result + entropy.lsb.value.hashCode()
+        return result
     }
 
     @OptIn(ExperimentalUuidApi::class)
+    @Suppress("MagicNumber")
     fun toUUID(): Uuid {
-        val source = binary
-        return Uuid.fromLongs(source.readLong(), source.readLong())
+        val mostSignificantBits = (timestamp.value shl 16) or (entropy.msb.value ushr 24)
+        val leastSignificantBits = ((entropy.msb.value and 0xFFFFFFL) shl 40) or entropy.lsb.value
+        return Uuid.fromLongs(mostSignificantBits, leastSignificantBits)
     }
 
 }
