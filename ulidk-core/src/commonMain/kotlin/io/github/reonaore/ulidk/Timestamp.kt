@@ -15,21 +15,21 @@ internal class Timestamp(
         }
     }
 
-    companion object : Base32Encoder, BinaryReadWriter {
-        override val base32StringLength = 10
-        override val bitSize = 48
+    companion object {
+        private const val BASE32_LENGTH = 10
+        private const val BYTE_SIZE = 6
         private const val BIT_MASK = 0xffffffffffff
 
-        fun fromDecodedBytes(byteList: List<Long>): Timestamp {
-            return Timestamp(decodeBytes(byteList))
+        fun fromBase32Digits(digits: List<Long>): Timestamp {
+            return Timestamp(decodeBase32Digits(digits, BASE32_LENGTH))
         }
 
         fun fromBinary(bin: ByteArray): Timestamp {
-            return Timestamp(readBinary(bin))
+            return Timestamp(readBinary(bin, BYTE_SIZE))
         }
     }
 
-    fun writeBase32(buf: Sink) = buf.writeBase32(value)
+    fun writeBase32(buf: Sink) = buf.writeBase32(value, BASE32_LENGTH)
 
-    fun write(buf: Sink) = buf.writeBinary(value)
+    fun write(buf: Sink) = buf.writeBinary(value, BYTE_SIZE)
 }

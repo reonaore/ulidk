@@ -69,4 +69,14 @@ class EntropyTest {
             assertEquals(EntropyValue(0).value, lsb.value)
         }
     }
+
+    @Test
+    fun equalBytesHaveEqualEntropy() {
+        val bytes = ByteArray(Entropy.BYTE_SIZE) { it.toByte() }
+        val first = Entropy.fromBinary(bytes)
+        val second = Entropy.fromBinary(bytes.copyOf())
+
+        assertEquals(first, second)
+        assertEquals(first.hashCode(), second.hashCode())
+    }
 }

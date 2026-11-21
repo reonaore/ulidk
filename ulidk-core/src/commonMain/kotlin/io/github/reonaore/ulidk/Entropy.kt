@@ -20,13 +20,14 @@ internal data class Entropy(
         internal const val BYTE_SIZE = 10
 
         /**
-         * This method is used to generate EntropyValue from bits list that is decoded from Base32 encoded string
-         * @param byteList
+         * Build entropy from its 16 decoded Base32 digits.
+         * @param digits decoded Base32 digits
          */
         @Suppress("MagicNumber")
-        fun fromDecodedBytes(byteList: List<Long>): Entropy {
-            val msb = EntropyValue(byteList.subList(0, 8))
-            val lsb = EntropyValue(byteList.subList(8, 16))
+        fun fromBase32Digits(digits: List<Long>): Entropy {
+            require(digits.size == 16) { "Expected 16 Base32 digits" }
+            val msb = EntropyValue(digits.subList(0, 8))
+            val lsb = EntropyValue(digits.subList(8, 16))
             return Entropy(msb, lsb)
         }
 
@@ -91,38 +92,33 @@ internal class EntropyValue(value: Long) {
 
     val value = value and BIT_MASK
 
-    companion object : Base32Encoder, BinaryReadWriter {
-        override val bitSize = 40
-        override val base32StringLength = 8
+    companion object {
+        private const val BASE32_LENGTH = 8
         private const val BIT_MASK = 0xffffffffff
         const val BYTE_SIZE = 5
-
-        @Throws(IllegalArgumentException::class)
-        private fun parseBinary(binary: ByteArray): Long {
-            require(binary.size == BYTE_SIZE) {
-                "Binary length must be $BYTE_SIZE"
-            }
-            return readBinary(binary)
-        }
     }
 
     operator fun inc() = EntropyValue(value + 1)
 
-    constructor(byteList: List<Long>) : this(decodeBytes(byteList))
-    constructor(binary: ByteArray) : this(parseBinary(binary))
+    constructor(digits: List<Long>) : this(decodeBase32Digits(digits, BASE32_LENGTH))
+    constructor(binary: ByteArray) : this(readBinary(binary, BYTE_SIZE))
 
     /**
      * Write the value as binary
      */
-    fun write(buf: Sink) = buf.writeBinary(value)
+    fun write(buf: Sink) = buf.writeBinary(value, BYTE_SIZE)
 
     /**
      * Write the value with Base32 encoded to buffer
      */
-    fun writeBase32(buf: Sink) = buf.writeBase32(value)
+    fun writeBase32(buf: Sink) = buf.writeBase32(value, BASE32_LENGTH)
 
     /**
      * @return true if the value is 40bits all high
      */
     fun isFull() = value == BIT_MASK
+
+    override fun equals(other: Any?): Boolean = other is EntropyValue && value == other.value
+
+    override fun hashCode(): Int = value.hashCode()
 }

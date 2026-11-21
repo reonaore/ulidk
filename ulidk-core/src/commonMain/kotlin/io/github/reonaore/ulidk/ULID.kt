@@ -12,6 +12,8 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -63,10 +65,10 @@ class ULID internal constructor(
         fun fromString(str: String): ULID {
             require(str.length == STRING_LENGTH) { "String length must be $STRING_LENGTH" }
 
-            val byteList = Base32Decoder.decodeBase32(str)
+            val digits = decodeBase32(str)
             return ULID(
-                timestamp = Timestamp.fromDecodedBytes(byteList.subList(0, 10)),
-                entropy = Entropy.fromDecodedBytes(byteList.subList(10, 26)),
+                timestamp = Timestamp.fromBase32Digits(digits.subList(0, 10)),
+                entropy = Entropy.fromBase32Digits(digits.subList(10, 26)),
             )
         }
 
@@ -93,11 +95,12 @@ class ULID internal constructor(
     }
 
     /**
-     * MonotonicGenerator generates new monotonic ULIDs.
+     * Generates ULIDs in strictly increasing order, including when called concurrently.
+     * Calls without a timestamp keep the most recently used timestamp; pass a later timestamp
+     * to start a new millisecond with fresh entropy.
      * @constructor creates its instance from an ULID.
-     * @property timestamp timestamp of the base ULID.
-     * @property entropy entropy of the base ULID. This is updated when a new ULID is generated.
      */
+    @OptIn(ExperimentalAtomicApi::class)
     class MonotonicGenerator private constructor(
         ulid: ULID,
         private val random: SecureRandomGenerator,
@@ -111,28 +114,33 @@ class ULID internal constructor(
             ) = MonotonicGenerator(ulid, random)
         }
 
-        private var timestamp = ulid.timestamp.value
-        private var entropy = ulid.entropy
+        private class State(val timestamp: Long, val entropy: Entropy)
+
+        private val state = AtomicReference(State(ulid.timestamp.value, ulid.entropy))
 
         /**
          * Generate a new monotonic ULID.
-         * @param timestamp timestamp of newly generated ULID.
+         * @param timestamp requested timestamp. By default, uses the generator's latest timestamp.
+         * A lower timestamp is ignored to preserve ordering.
          * @return monotonic ULID
          * @throws IllegalStateException when entropy is overflowed
          */
-        operator fun invoke(timestamp: Long = this.timestamp): ULID {
+        operator fun invoke(timestamp: Long = state.load().timestamp): ULID {
             val requestedTimestamp = Timestamp(timestamp).value
-            if (requestedTimestamp > this.timestamp) {
-                val nextEntropy = Entropy.fromBinary(random.nextBytes(Entropy.BYTE_SIZE))
-                this.timestamp = requestedTimestamp
-                entropy = nextEntropy
-            } else {
-                check(!entropy.isFull()) {
-                    "Entropy will be overflowed"
+            while (true) {
+                val current = state.load()
+                val next = if (requestedTimestamp > current.timestamp) {
+                    State(requestedTimestamp, Entropy.fromBinary(random.nextBytes(Entropy.BYTE_SIZE)))
+                } else {
+                    check(!current.entropy.isFull()) {
+                        "Entropy will be overflowed"
+                    }
+                    State(current.timestamp, current.entropy.inc())
                 }
-                entropy++
+                if (state.compareAndSet(current, next)) {
+                    return ULID(Timestamp(next.timestamp), next.entropy)
+                }
             }
-            return ULID(timestamp = Timestamp(this.timestamp), entropy = entropy)
         }
     }
 
