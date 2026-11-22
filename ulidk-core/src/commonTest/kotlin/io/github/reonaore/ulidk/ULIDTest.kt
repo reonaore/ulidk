@@ -144,6 +144,16 @@ class ULIDTest {
     }
 
     @Test
+    fun monotonicDefaultKeepsLatestTimestamp() {
+        val input = ULID.fromString("01BX5ZZKBKACTAV9WEVGEMMVRY")
+        val generator = ULID.MonotonicGenerator(input)
+
+        assertEquals(input.timestamp(), generator().timestamp())
+        val later = generator(input.timestamp() + 1)
+        assertEquals(later.timestamp(), generator().timestamp())
+    }
+
+    @Test
     fun monotonicEdgeCase() {
         val ulidGen = ULID.MonotonicGenerator(ULID.fromString("01BX5ZZKBKZZZZZZZZZZZZZZZY"))
         assertEquals("01BX5ZZKBKZZZZZZZZZZZZZZZZ", ulidGen().toString())

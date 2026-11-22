@@ -77,7 +77,10 @@ ulidGen() // 000XAL6S41ACTAV9WEVGEMMVRA
 ulidGen() // 000XAL6S41ACTAV9WEVGEMMVRB
 ulidGen() // 000XAL6S41ACTAV9WEVGEMMVRC
 
-// Even if a lower timestamp is passed (or generated), it will preserve sort order
+// A call without a timestamp keeps the generator's latest timestamp, even as wall time advances.
+// Calls can safely share one generator across threads.
+
+// Even if a lower timestamp is passed, it will preserve sort order
 ulidGen(100000) // 000XAL6S41ACTAV9WEVGEMMVRD
 
 // A later timestamp starts a new millisecond with fresh secure entropy
