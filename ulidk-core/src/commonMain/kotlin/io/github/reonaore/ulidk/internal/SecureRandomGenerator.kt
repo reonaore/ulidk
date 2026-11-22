@@ -5,6 +5,4 @@ interface SecureRandomGenerator {
     fun nextBytes(length: Int): ByteArray
 }
 
-fun getSecureRandomGenerator(): SecureRandomGenerator {
-    return SecureRandomGeneratorImpl()
-}
+expect fun getSecureRandomGenerator(): SecureRandomGenerator
